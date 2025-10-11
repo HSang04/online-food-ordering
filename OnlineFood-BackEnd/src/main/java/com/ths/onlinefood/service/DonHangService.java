@@ -61,6 +61,9 @@ public class DonHangService {
         donHang.setNguoiDung(nguoiDung);
         donHang.setDiaChiGiaoHang(request.getDiaChiGiaoHang());
         donHang.setGhiChu(request.getGhiChu());
+        donHang.setLatGiaoHang(request.getLatGiaoHang());
+        donHang.setLonGiaoHang(request.getLonGiaoHang());
+
         
         if (request.getVoucherId() != null) {
             Voucher voucher = voucherRepository.findById(request.getVoucherId())

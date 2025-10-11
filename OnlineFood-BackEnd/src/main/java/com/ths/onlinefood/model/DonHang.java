@@ -46,4 +46,10 @@ public class DonHang {
     @OneToMany(mappedBy = "donHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"donHang", "hibernateLazyInitializer"})
     private List<ChiTietDonHang> chiTietDonHang;
-    }
+    
+    @Column(name = "lat_giao_hang")
+    private Double latGiaoHang;
+
+    @Column(name = "lon_giao_hang")
+    private Double lonGiaoHang;
+}

@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### GraphHopper - File OSM và Cache ###
+# Bỏ qua file OSM (rất nặng ~500MB)
+/data/vietnam-latest.osm.pbf
+/data/*.osm.pbf
+/data/*.osm
+
+# Bỏ qua cache GraphHopper (tự tạo lại được)
+/data/graphhopper-cache/
+
+# Nhưng GIỮ LẠI thư mục data trong Git
+!/data/
+!/data/.gitkeep

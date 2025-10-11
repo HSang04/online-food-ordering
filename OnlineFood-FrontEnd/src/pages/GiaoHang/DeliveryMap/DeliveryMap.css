@@ -1,0 +1,275 @@
+.delivery-map-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.map-control-panel,
+.tracking-info-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.map-control-panel h3,
+.tracking-info-panel h3 {
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.control-group {
+  margin-bottom: 15px;
+}
+
+.btn-gps,
+.btn-search {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-gps {
+  background: #3b82f6;
+  color: white;
+  width: 100%;
+}
+
+.btn-gps:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.btn-gps:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.search-box {
+  display: flex;
+  gap: 8px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.btn-search {
+  background: #10b981;
+  color: white;
+  padding: 10px 20px;
+}
+
+.btn-search:hover:not(:disabled) {
+  background: #059669;
+}
+
+.btn-search:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.hint-text {
+  font-size: 13px;
+  color: #6b7280;
+  padding: 10px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.route-info-panel {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.route-info-panel h4 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #1e40af;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #dbeafe;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item span {
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.info-item strong {
+  color: #1f2937;
+  font-size: 15px;
+}
+
+.tracking-status {
+  margin-bottom: 15px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.map-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  gap: 10px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.map-popup {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.map-popup strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.route-steps-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.route-steps-panel h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #1f2937;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.step-item:hover {
+  background: #f3f4f6;
+}
+
+.step-number {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-instruction {
+  color: #1f2937;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.step-details {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .map-wrapper {
+    height: 400px;
+  }
+
+  .search-box {
+    flex-direction: column;
+  }
+
+  .btn-search {
+    width: 100%;
+  }
+
+  .route-steps-panel {
+    max-height: 300px;
+  }
+}
