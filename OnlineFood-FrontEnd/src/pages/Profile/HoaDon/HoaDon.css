@@ -1,0 +1,531 @@
+.hoa-don-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.hoa-don-content {
+  padding: 20px;
+}
+
+/* Loading & Error */
+.loading, .error {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+}
+
+.error {
+  color: #e74c3c;
+}
+
+/* Invoice Header */
+.invoice-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #2c5aa0;
+}
+
+.invoice-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c5aa0;
+  margin: 0 0 10px 0;
+}
+
+.invoice-header p {
+  margin: 5px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Invoice Info */
+.invoice-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.invoice-info div {
+  line-height: 1.5;
+}
+
+/* Invoice Details */
+.invoice-details {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.invoice-details h4 {
+  margin: 0 0 15px 0;
+  color: #2c5aa0;
+  font-size: 16px;
+  font-weight: bold;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 5px 0;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-row span:first-child {
+  font-weight: 500;
+  color: #555;
+}
+
+.detail-row span:last-child {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Order Table */
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.order-table th,
+.order-table td {
+  border: 1px solid #ddd;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.order-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #2c5aa0;
+  font-size: 14px;
+}
+
+.order-table td {
+  font-size: 14px;
+}
+
+.order-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Total Section */
+.total-section {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border: 2px solid #2c5aa0;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.total-amount {
+  font-size: 18px !important;
+  font-weight: bold !important;
+  border-top: 2px solid #2c5aa0;
+  margin-top: 15px;
+  padding-top: 15px;
+}
+
+.total-amount span {
+  color: #2c5aa0 !important;
+  font-weight: bold !important;
+}
+
+/* Invoice Footer */
+.invoice-footer {
+  text-align: center;
+  margin: 30px 0;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  font-style: italic;
+  color: #666;
+}
+
+.invoice-footer p {
+  margin: 5px 0;
+}
+
+.invoice-footer p:first-child {
+  color: #2c5aa0;
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding: 20px 0;
+  border-top: 1px solid #eee;
+  margin-top: 20px;
+}
+
+.action-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.print-button {
+  background-color: #2c5aa0;
+  color: white;
+}
+
+.print-button:hover {
+  background-color: #1e3f73;
+  transform: translateY(-1px);
+}
+
+.primary-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: #1e7e34;
+  transform: translateY(-1px);
+}
+
+.secondary-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.secondary-button:hover {
+  background-color: #545b62;
+  transform: translateY(-1px);
+}
+
+@media print {
+  /* Ẩn mọi thứ không liên quan */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Chỉ hiển thị phần hóa đơn */
+  .hoa-don-content, 
+  .hoa-don-content * {
+    visibility: visible;
+  }
+
+  /* Đưa phần hóa đơn ra đầu trang khi in */
+  .hoa-don-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  /* Ẩn các nút bấm */
+  .no-print, 
+  .action-buttons {
+    display: none !important;
+  }
+
+  /* Xóa nền, bo góc, shadow */
+  .hoa-don-container {
+    background: white !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+
+  /* Chỉnh lại màu chữ khi in (đen trắng) */
+  .invoice-title,
+  .invoice-details h4,
+  .detail-row span,
+  .order-table th,
+  .order-table td,
+  .total-section,
+  .invoice-footer {
+    color: black !important;
+  }
+
+  /* Bỏ màu nền bảng, giữ viền đen */
+  .order-table th {
+    background: none !important;
+    border: 1px solid black !important;
+  }
+  .order-table td {
+    border: 1px solid black !important;
+  }
+
+  /* Thu nhỏ font để in vừa trang */
+  body {
+    font-size: 13px;
+  }
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hoa-don-container {
+    margin: 10px;
+    padding: 0;
+  }
+  
+  .hoa-don-content {
+    padding: 15px;
+  }
+  
+  .invoice-title {
+    font-size: 20px;
+  }
+  
+  .invoice-info {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .detail-row span:last-child {
+    font-weight: bold;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+    padding: 12px;
+  }
+  
+  .order-table {
+    font-size: 12px;
+  }
+  
+  .order-table th,
+  .order-table td {
+    padding: 8px 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hoa-don-content {
+    padding: 10px;
+  }
+  
+  .invoice-title {
+    font-size: 18px;
+  }
+  
+  .invoice-header p {
+    font-size: 12px;
+  }
+  
+  .invoice-info {
+    font-size: 12px;
+  }
+  
+  .invoice-details {
+    padding: 10px;
+  }
+  
+  .order-table {
+    font-size: 11px;
+  }
+  
+  .order-table th,
+  .order-table td {
+    padding: 6px 3px;
+  }
+  
+  .total-section {
+    padding: 15px;
+  }
+  
+  .total-amount {
+    font-size: 16px !important;
+  }
+}
+/* Voucher section styling */
+.voucher-section {
+  background: linear-gradient(135deg, #fff9e6, #fff3cd);
+  border: 2px dashed #f39c12;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.voucher-section h4 {
+  color: #d35400;
+  margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.voucher-code {
+  font-weight: bold;
+  color: #d35400;
+  background: rgba(243, 156, 18, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.voucher-discount .discount-amount {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.discount-row {
+  background: rgba(231, 76, 60, 0.1);
+  padding: 0.3rem;
+  border-radius: 4px;
+  margin: 0.2rem 0;
+}
+
+.discount-row .discount-amount {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* Total section improvements */
+.total-section .detail-row {
+  padding: 0.4rem 0;
+  border-bottom: 1px dotted #ddd;
+}
+
+.total-section .detail-row:last-child {
+  border-bottom: none;
+}
+
+.total-amount {
+  background: #f8f9fa;
+  padding: 0.8rem !important;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2c3e50;
+  border: 2px solid #3498db !important;
+}
+
+/* Invoice footer enhancements */
+.invoice-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-top: 3px solid #3498db;
+}
+
+.invoice-footer p {
+  margin: 0.5rem 0;
+}
+
+.invoice-footer em {
+  color: #27ae60;
+  font-weight: 500;
+}
+
+/* Print-specific styles */
+@media print {
+  .voucher-section {
+    background: #fff;
+    border: 1px solid #ddd;
+  }
+  
+  .voucher-code {
+    background: #f0f0f0;
+  }
+  
+  .total-amount {
+    background: #f5f5f5;
+    border: 1px solid #333 !important;
+  }
+
+  .shipping-note {
+    background: #fff;
+    border: 1px solid #333;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .voucher-section {
+    padding: 0.8rem;
+    margin: 0.8rem 0;
+  }
+  
+  .voucher-section h4 {
+    font-size: 1rem;
+  }
+  
+  .voucher-code {
+    font-size: 0.9rem;
+  }
+
+  .shipping-note {
+    padding: 0.8rem;
+  }
+
+  .shipping-note .note-header {
+    font-size: 0.9rem;
+  }
+
+  .shipping-note .note-content p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Shipping note styling */
+.shipping-note {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.shipping-note .note-header {
+  font-weight: bold;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.shipping-note .note-content p {
+  margin: 0.3rem 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.shipping-note .note-content em {
+  color: #dc3545;
+  font-style: italic;
+}
