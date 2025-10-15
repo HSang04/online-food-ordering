@@ -13,7 +13,7 @@ import java.io.File;
 @Configuration
 public class GraphHopperConfig {
 
-    @Value("${graphhopper.osm.file:data/vietnam-251010.osm.pbf}")
+    @Value("${graphhopper.osm.file:data/vietnam-251014.osm.pbf}")
     private String osmFile;
 
     @Value("${graphhopper.cache.dir:data/graphhopper-cache}")

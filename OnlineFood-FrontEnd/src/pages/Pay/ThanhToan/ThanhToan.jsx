@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../../../services/axiosInstance";
-import DeliveryMap from "../../GiaoHang/DeliveryMap/DeliveryMap";
 import "./ThanhToan.css";
 
 const ThanhToan = () => {
@@ -19,9 +18,6 @@ const ThanhToan = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [phuongThucThanhToan, setPhuongThucThanhToan] = useState("COD"); 
-
-  const [showMap, setShowMap] = useState(false);
-  const [selectedMapLocation, setSelectedMapLocation] = useState(null);
 
   const nguoiDungId = localStorage.getItem("idNguoiDung");
   const jwt = localStorage.getItem("jwt");
@@ -304,11 +300,7 @@ const ThanhToan = () => {
       if (phuongThucThanhToan === "VNPAY") {
         await handleVNPayPayment(khoangCach);
       } else {
-         const donHangData = {
-       // ... các field hiện tại ...
-          latGiaoHang: selectedMapLocation?.lat || null,
-          lonGiaoHang: selectedMapLocation?.lng || null,
-        };
+        const donHangData = taoDuLieuDonHang(khoangCach);
 
         console.log("Dữ liệu đặt hàng COD:", donHangData);
         
@@ -386,27 +378,6 @@ const ThanhToan = () => {
       setLoading(false);
     }
   };
-
-  const handleLocationSelect = (location) => {
-  setSelectedMapLocation(location);
-  // Có thể reverse geocode để lấy địa chỉ văn bản
-  reverseGeocode(location.lat, location.lng);
-};
-
-// Hàm reverse geocode
-const reverseGeocode = async (lat, lng) => {
-  try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-    );
-    const data = await response.json();
-    if (data && data.display_name) {
-      setDiaChi(data.display_name);
-    }
-  } catch (error) {
-    console.error('Lỗi reverse geocode:', error);
-  }
-};
 
   return (
     <div className="thanh-toan-container">
@@ -502,33 +473,6 @@ const reverseGeocode = async (lat, lng) => {
               <span>Ví dụ: "40 Ngô Đức Kế, Phường Sài Gòn", "UBND Tp. Hồ Chí Minh"</span>
             </div>
           </div>
-
-           <button 
-              onClick={() => setShowMap(!showMap)}
-              className="btn-toggle-map"
-              type="button"
-            >
-              {showMap ? '🗺️ Ẩn bản đồ' : '🗺️ Chọn trên bản đồ'}
-            </button>
-            
-            {showMap && (
-              <div className="map-container">
-                <DeliveryMapComponent
-                  mode="select"
-                  onLocationSelect={handleLocationSelect}
-                  initialDeliveryLocation={selectedMapLocation}
-                />
-              </div>
-            )}
-            
-            {selectedMapLocation && (
-              <div className="selected-location-info">
-                <span className="info-icon">✅</span>
-                <span>
-                  Đã chọn vị trí: {selectedMapLocation.lat.toFixed(6)}, {selectedMapLocation.lng.toFixed(6)}
-                </span>
-              </div>
-            )}
         </div>
       </div>
 
@@ -608,7 +552,7 @@ const reverseGeocode = async (lat, lng) => {
         </div>
       </div>
 
-      {/*Them info phi ship */}
+      {/* Thêm section thông tin phí ship */}
       <div className="section">
         <h3 className="section-title">🚚 Thông tin giao hàng & Phí ship</h3>
         <div className="delivery-info">

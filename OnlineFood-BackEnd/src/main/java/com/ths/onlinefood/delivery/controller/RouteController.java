@@ -83,9 +83,7 @@ public class RouteController {
         }
     }
     
-    /**
-     * Test GraphHopper
-     */
+
     @GetMapping("/test")
     public ResponseEntity<String> testGraphHopper() {
         try {

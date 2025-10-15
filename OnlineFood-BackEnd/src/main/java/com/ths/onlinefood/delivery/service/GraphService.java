@@ -28,7 +28,7 @@ public class GraphService {
     
     private final GraphNodeRepository nodeRepository;
     private final GraphEdgeRepository edgeRepository;
-    private final DijkstraService dijkstraService;
+//    private final DijkstraService dijkstraService;
     
     /**
      * Tạo nút mới
@@ -104,11 +104,11 @@ public class GraphService {
             .orElseThrow(() -> new IllegalArgumentException("Nút kết thúc không tồn tại"));
         
         // Tính khoảng cách tự động
-        Double distance = dijkstraService.calculateDistance(
+        Double distance = calculateDistance( // ✅ Gọi method riêng
             startNode.getLatitude(), startNode.getLongitude(),
             endNode.getLatitude(), endNode.getLongitude()
         );
-        
+
         // Tính thời gian dự kiến (dựa trên loại đường)
         Double speed = switch (roadType) {
             case HIGHWAY -> 60.0;        // 60 km/h
@@ -138,6 +138,20 @@ public class GraphService {
         return saved;
     }
     
+    
+    private Double calculateDistance(Double lat1, Double lon1, Double lat2, Double lon2) {
+    final int R = 6371;
+    Double latDistance = Math.toRadians(lat2 - lat1);
+    Double lonDistance = Math.toRadians(lon2 - lon1);
+    
+    Double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+            + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+            * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+    
+    Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+    return R * c;
+}
     /**
      * Cập nhật cạnh
      */

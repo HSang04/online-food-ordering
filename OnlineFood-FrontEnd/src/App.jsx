@@ -32,6 +32,8 @@ import TinNhan from './pages/Profile/TinNhan/TinNhan';
 import QuanLyCuaHang from './pages/Admin/QuanLyCuaHang/QuanLyCuaHang';
 import QuanLyGiaoDich from './pages/Admin/QuanLyGiaoDich/QuanLyGiaoDich';
 
+import TestMap from './pages/GiaoHang/TestMap/TestMap';
+
 const App = () => {
   return (
     <Router>
@@ -72,6 +74,9 @@ const App = () => {
           <Route path="/quan-ly-thong-tin" element={<RequireAuth allowedRoles={['ADMIN', 'QUANLY']}><QuanLyCuaHang /></RequireAuth>} />
 
           <Route path="/thong-ke" element={<RequireAdmin><ThongKe /></RequireAdmin>} />
+
+          <Route path="/test-map" element={<TestMap />} />
+
         </Routes>
       </div>
       <Footer />

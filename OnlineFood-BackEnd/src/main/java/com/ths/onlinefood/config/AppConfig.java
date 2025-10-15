@@ -27,6 +27,8 @@ public class AppConfig {
         http
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
+                    
+                  .requestMatchers("/api/delivery/**").permitAll()   
               
                 .requestMatchers("/auth/signup", "/auth/login").permitAll()
                 .requestMatchers("/auth/signup-by-admin").hasAnyAuthority("ADMIN", "QUANLY")
@@ -55,6 +57,7 @@ public class AppConfig {
                 .requestMatchers(HttpMethod.GET, "/api/hoa-don/**").hasAnyAuthority("ADMIN", "QUANLY", "NHANVIEN_QUANLYDONHANG", "KHACHHANG")
                 .requestMatchers(HttpMethod.GET, "/api/thong-tin-cua-hang/**").permitAll()    
 //              .requestMatchers(HttpMethod.POST,"/api/hoa-don/**").hasAnyAuthority("KHACHHANG")
+                    
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             )
