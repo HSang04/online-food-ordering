@@ -1,9 +1,8 @@
 package com.ths.onlinefood.delivery.controller;
 
 import com.ths.onlinefood.delivery.dto.RouteResponse;
-import com.ths.onlinefood.delivery.model.*;
+import com.ths.onlinefood.delivery.model.DeliveryRoute;
 import com.ths.onlinefood.delivery.service.DijkstraService;
-import com.ths.onlinefood.delivery.service.GraphService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 public class RouteController {
     
     private final DijkstraService dijkstraService;
-    private final GraphService graphService;
     
     /**
      * Tính đường đi ngắn nhất từ A đến B
@@ -36,6 +34,7 @@ public class RouteController {
             response.setMessage("Tìm thấy đường đi");
             response.setRoutePath(route.getCoordinates());
             response.setTotalDistance(route.getTotalDistance());
+            response.setEstimatedDuration(route.getEstimatedDuration());
             response.setRouteSummary(route.getRouteSummary());
             response.setSteps(route.getSteps());
             response.setNodeCount(route.getCoordinates().size());
@@ -50,52 +49,27 @@ public class RouteController {
     }
     
     /**
-     * Tính đường đi từ cửa hàng đến khách hàng
+     * Test endpoint
      */
-    @GetMapping("/store-to-customer")
-    public ResponseEntity<RouteResponse> getStoreToCustomerRoute(
-            @RequestParam Double customerLat,
-            @RequestParam Double customerLon) {
-        try {
-            var storeNode = graphService.getStoreNode()
-                .orElseThrow(() -> new IllegalStateException("Không tìm thấy cửa hàng"));
-            
-            DeliveryRoute route = dijkstraService.findShortestPath(
-                storeNode.getLatitude(), storeNode.getLongitude(),
-                customerLat, customerLon
-            );
-            
-            RouteResponse response = new RouteResponse();
-            response.setSuccess(true);
-            response.setMessage("Tìm thấy đường đi từ cửa hàng");
-            response.setRoutePath(route.getCoordinates());
-            response.setTotalDistance(route.getTotalDistance());
-            response.setRouteSummary(route.getRouteSummary());
-            response.setSteps(route.getSteps());
-            response.setNodeCount(route.getCoordinates().size());
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            RouteResponse response = new RouteResponse();
-            response.setSuccess(false);
-            response.setMessage("Lỗi: " + e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-    
-
     @GetMapping("/test")
-    public ResponseEntity<String> testGraphHopper() {
+    public ResponseEntity<String> testDijkstra() {
         try {
+            // Test 2 điểm ở TP.HCM
             DeliveryRoute route = dijkstraService.findShortestPath(
-                10.7726, 106.6980,
-                10.7797, 106.6990
+                10.7769, 106.7009,  // Quận 1
+                10.7863, 106.6839   // Quận 3
             );
             
             return ResponseEntity.ok(
-                String.format("✅ GraphHopper OK!\nKhoảng cách: %.2f km\nĐiểm: %d", 
-                             route.getTotalDistance(), 
-                             route.getCoordinates().size())
+                String.format("✅ Dijkstra OK!\n" +
+                             "Khoảng cách: %.2f km\n" +
+                             "Thời gian: %.0f phút\n" +
+                             "Điểm: %d\n" +
+                             "Mô tả: %s", 
+                             route.getTotalDistance(),
+                             route.getEstimatedDuration(),
+                             route.getCoordinates().size(),
+                             route.getRouteSummary())
             );
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("❌ Lỗi: " + e.getMessage());

@@ -2,9 +2,12 @@ package com.ths.onlinefood.delivery.service;
 
 import com.graphhopper.GraphHopper;
 import com.graphhopper.storage.Graph;
+import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.storage.index.LocationIndex;
 import com.graphhopper.storage.index.Snap;
+import com.graphhopper.util.EdgeIterator;
 import com.ths.onlinefood.delivery.model.DeliveryRoute;
+import com.ths.onlinefood.delivery.model.RouteStep;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,138 +22,171 @@ public class DijkstraService {
     private final GraphHopper graphHopper;
     
     /**
-     * DIJKSTRA THUẦN TÚY - Dùng dữ liệu OSM từ GraphHopper
+     * ================================
+     * PUBLIC API - Tìm đường từ GPS coordinates
+     * ================================
      */
     public DeliveryRoute findShortestPath(Double latStart, Double lonStart, 
                                           Double latEnd, Double lonEnd) {
         
-        log.info("🔍 Dijkstra: ({}, {}) → ({}, {})", 
+        log.info("🔍 Tìm đường: ({}, {}) → ({}, {})", 
                  latStart, lonStart, latEnd, lonEnd);
         
         try {
-            // Bước 1: Lấy graph từ GraphHopper
             Graph graph = graphHopper.getBaseGraph();
             LocationIndex locationIndex = graphHopper.getLocationIndex();
             
-            // Bước 2: Tìm node gần nhất trong OSM graph
-            Snap snapStart = locationIndex.findClosest(latStart, lonStart, 
-                edgeState -> true); // Accept all edges
-            Snap snapEnd = locationIndex.findClosest(latEnd, lonEnd, 
-                edgeState -> true); // Accept all edges
+            // Bước 1: Map GPS → OSM Node ID
+            int startNode = findNearestNode(locationIndex, latStart, lonStart);
+            int endNode = findNearestNode(locationIndex, latEnd, lonEnd);
             
-            if (!snapStart.isValid() || !snapEnd.isValid()) {
-                log.error("❌ Không tìm thấy node gần vị trí");
-                return createDirectRoute(latStart, lonStart, latEnd, lonEnd);
+            if (startNode == -1 || endNode == -1) {
+                log.error("❌ Không tìm thấy node OSM gần vị trí");
+                return createFallbackRoute(latStart, lonStart, latEnd, lonEnd);
             }
-            
-            int startNode = snapStart.getClosestNode();
-            int endNode = snapEnd.getClosestNode();
             
             log.info("📍 Start Node: {} | End Node: {}", startNode, endNode);
             
-            // Bước 3: Chạy DIJKSTRA THUẦN TÚY
-            DijkstraResult result = runPureDijkstra(graph, startNode, endNode);
+            // Bước 2: Chạy thuật toán Dijkstra
+            PathResult pathResult = dijkstra(graph, startNode, endNode);
             
-            if (result == null || result.path.isEmpty()) {
+            if (pathResult == null) {
                 log.error("❌ Không tìm thấy đường đi");
-                return createDirectRoute(latStart, lonStart, latEnd, lonEnd);
+                return createFallbackRoute(latStart, lonStart, latEnd, lonEnd);
             }
             
-            // Bước 4: Xây dựng DeliveryRoute
-            DeliveryRoute route = buildRoute(graph, result, latStart, lonStart, latEnd, lonEnd);
+            // Bước 3: Build DeliveryRoute từ kết quả
+            DeliveryRoute route = buildRouteFromPath(
+                graph, pathResult, latStart, lonStart, latEnd, lonEnd
+            );
             
-            log.info("✅ Dijkstra: {:.2f} km, {} nodes", 
-                     route.getTotalDistance(), result.path.size());
+            log.info("✅ Thành công: {:.2f} km, {} nodes", 
+                     route.getTotalDistance(), pathResult.path.size());
             
             return route;
             
         } catch (Exception e) {
-            log.error("❌ Lỗi Dijkstra: ", e);
-            return createDirectRoute(latStart, lonStart, latEnd, lonEnd);
+            log.error("❌ Lỗi tìm đường: ", e);
+            return createFallbackRoute(latStart, lonStart, latEnd, lonEnd);
         }
     }
     
     /**
-     * THUẬT TOÁN DIJKSTRA THUẦN TÚY
-     * Chạy trên graph OSM thật
+     * ================================
+     * DIJKSTRA ALGORITHM - Pure Implementation
+     * ================================
+     * Bạn có thể thay thế method này bằng A*, Bellman-Ford, etc.
      */
-    private DijkstraResult runPureDijkstra(Graph graph, int startNode, int endNode) {
-        log.info("🚀 Bắt đầu Dijkstra: {} → {}", startNode, endNode);
+    private PathResult dijkstra(Graph graph, int startNode, int endNode) {
+        log.info("🚀 Dijkstra: {} → {}", startNode, endNode);
         
-        // Khởi tạo
+        // Cấu trúc dữ liệu
         Map<Integer, Double> distances = new HashMap<>();
         Map<Integer, Integer> previous = new HashMap<>();
         Set<Integer> visited = new HashSet<>();
-        PriorityQueue<NodeDistance> queue = new PriorityQueue<>(
+        
+        // Priority Queue: (node, distance)
+        PriorityQueue<NodeDistance> pq = new PriorityQueue<>(
             Comparator.comparingDouble(nd -> nd.distance)
         );
         
-        // Khởi tạo điểm bắt đầu
+        // Khởi tạo
         distances.put(startNode, 0.0);
-        queue.offer(new NodeDistance(startNode, 0.0));
+        pq.offer(new NodeDistance(startNode, 0.0));
         
         int iterations = 0;
-        int maxIterations = 100000; // Giới hạn để tránh loop vô hạn
+        int maxIterations = 1000000; // Giới hạn để tránh loop vô hạn
         
-        // DIJKSTRA LOOP
-        while (!queue.isEmpty() && iterations < maxIterations) {
-            NodeDistance current = queue.poll();
+        // ===== DIJKSTRA MAIN LOOP =====
+        while (!pq.isEmpty() && iterations < maxIterations) {
+            NodeDistance current = pq.poll();
             int currentNode = current.node;
+            double currentDist = current.distance;
             
             iterations++;
             
-            // Đã thăm rồi
+            // Skip nếu đã visit
             if (visited.contains(currentNode)) {
                 continue;
             }
             
             visited.add(currentNode);
             
-            if (iterations % 1000 == 0) {
+            // Log progress
+            if (iterations % 10000 == 0) {
                 log.debug("📊 Iteration {}: node {}, dist {:.2f} km", 
-                         iterations, currentNode, current.distance / 1000);
+                         iterations, currentNode, currentDist / 1000);
             }
             
-            // Tìm thấy đích!
+            // ✅ TÌM THẤY ĐÍCH!
             if (currentNode == endNode) {
                 log.info("🎯 Tìm thấy đích sau {} iterations", iterations);
                 return reconstructPath(startNode, endNode, previous, distances);
             }
             
-            // Duyệt các cạnh kề (edges)
-            var edgeIterator = graph.createEdgeExplorer().setBaseNode(currentNode);
+            // Duyệt tất cả các cạnh kề (neighbors)
+            EdgeIterator edgeIter = graph.createEdgeExplorer().setBaseNode(currentNode);
             
-            while (edgeIterator.next()) {
-                int neighbor = edgeIterator.getAdjNode();
+            while (edgeIter.next()) {
+                int neighbor = edgeIter.getAdjNode();
                 
+                // Skip nếu đã visit
                 if (visited.contains(neighbor)) {
                     continue;
                 }
                 
-                // Lấy khoảng cách của cạnh (mét)
-                double edgeDistance = edgeIterator.getDistance();
-                double newDistance = current.distance + edgeDistance;
+                // Lấy khoảng cách cạnh (meters)
+                double edgeDistance = edgeIter.getDistance();
+                double newDistance = currentDist + edgeDistance;
                 double oldDistance = distances.getOrDefault(neighbor, Double.MAX_VALUE);
                 
-                // RELAX EDGE
+                // ===== RELAXATION =====
                 if (newDistance < oldDistance) {
                     distances.put(neighbor, newDistance);
                     previous.put(neighbor, currentNode);
-                    queue.offer(new NodeDistance(neighbor, newDistance));
+                    pq.offer(new NodeDistance(neighbor, newDistance));
                 }
             }
         }
         
-        log.error("❌ Không tìm thấy đường sau {} iterations", iterations);
+        // Không tìm thấy đường
+        log.error("❌ Dijkstra failed sau {} iterations", iterations);
         return null;
     }
     
     /**
-     * Tái tạo đường đi từ kết quả Dijkstra
+     * ================================
+     * HELPER METHODS
+     * ================================
      */
-    private DijkstraResult reconstructPath(int startNode, int endNode,
-                                          Map<Integer, Integer> previous,
-                                          Map<Integer, Double> distances) {
+    
+    /**
+     * Tìm OSM node gần nhất với GPS coordinate
+     */
+    private int findNearestNode(LocationIndex locationIndex, Double lat, Double lon) {
+        Snap snap = locationIndex.findClosest(lat, lon, edgeState -> true);
+        
+        if (!snap.isValid()) {
+            log.warn("⚠️ Không tìm thấy node OSM gần ({}, {})", lat, lon);
+            return -1;
+        }
+        
+        int nodeId = snap.getClosestNode();
+        double distance = snap.getQueryDistance();
+        
+        log.debug("📍 GPS ({}, {}) → Node {} (cách {:.0f}m)", 
+                 lat, lon, nodeId, distance);
+        
+        return nodeId;
+    }
+    
+    /**
+     * Reconstruct path từ kết quả Dijkstra
+     */
+    private PathResult reconstructPath(int startNode, int endNode,
+                                      Map<Integer, Integer> previous,
+                                      Map<Integer, Double> distances) {
+        
         List<Integer> path = new ArrayList<>();
         Integer current = endNode;
         
@@ -160,61 +196,89 @@ public class DijkstraService {
             current = previous.get(current);
         }
         
-        // Validate
+        // Validate path
         if (path.isEmpty() || path.get(0) != startNode) {
             log.error("❌ Path không hợp lệ");
             return null;
         }
         
-        double totalDistance = distances.get(endNode);
+        double totalDistanceMeters = distances.get(endNode);
+        double totalDistanceKm = totalDistanceMeters / 1000.0;
         
-        DijkstraResult result = new DijkstraResult();
+        PathResult result = new PathResult();
         result.path = path;
-        result.totalDistance = totalDistance / 1000.0; // Chuyển sang km
+        result.totalDistance = totalDistanceKm;
         
-        log.info("📊 Path: {} nodes, {:.2f} km", path.size(), result.totalDistance);
+        log.info("📊 Path: {} nodes, {:.2f} km", path.size(), totalDistanceKm);
         
         return result;
     }
     
     /**
-     * Xây dựng DeliveryRoute từ path
+     * Build DeliveryRoute từ path
      */
-    private DeliveryRoute buildRoute(Graph graph, DijkstraResult result,
-                                     Double latStart, Double lonStart,
-                                     Double latEnd, Double lonEnd) {
+    private DeliveryRoute buildRouteFromPath(Graph graph, PathResult pathResult,
+                                            Double latStart, Double lonStart,
+                                            Double latEnd, Double lonEnd) {
+        
+        NodeAccess nodeAccess = graph.getNodeAccess();
+        
         DeliveryRoute route = new DeliveryRoute();
         List<double[]> coordinates = new ArrayList<>();
+        List<RouteStep> steps = new ArrayList<>();
         
         // Thêm điểm bắt đầu thực tế
         coordinates.add(new double[]{latStart, lonStart});
         
         // Thêm tọa độ của các nodes trên đường đi
-        for (int nodeId : result.path) {
-            double lat = graph.getNodeAccess().getLat(nodeId);
-            double lon = graph.getNodeAccess().getLon(nodeId);
+        for (int i = 0; i < pathResult.path.size(); i++) {
+            int nodeId = pathResult.path.get(i);
+            double lat = nodeAccess.getLat(nodeId);
+            double lon = nodeAccess.getLon(nodeId);
             coordinates.add(new double[]{lat, lon});
+            
+            // Tạo step nếu không phải node cuối
+            if (i < pathResult.path.size() - 1) {
+                int nextNodeId = pathResult.path.get(i + 1);
+                double nextLat = nodeAccess.getLat(nextNodeId);
+                double nextLon = nodeAccess.getLon(nextNodeId);
+                
+                double stepDistance = calculateDistance(lat, lon, nextLat, nextLon);
+                
+                RouteStep step = new RouteStep();
+                step.setInstruction(String.format("Đi %.0f mét", stepDistance * 1000));
+                step.setDistance(stepDistance);
+                step.setDuration(stepDistance / 25.0 * 60.0); // 25km/h
+                step.setStartCoordinate(new double[]{lat, lon});
+                step.setEndCoordinate(new double[]{nextLat, nextLon});
+                
+                steps.add(step);
+            }
         }
         
         // Thêm điểm kết thúc thực tế
         coordinates.add(new double[]{latEnd, lonEnd});
         
         route.setCoordinates(coordinates);
-        route.setTotalDistance(result.totalDistance);
-        route.setRouteSummary(String.format("Res Dijkstra: %.2f km qua %d nodes", 
-                                           result.totalDistance, 
-                                           result.path.size()));
-        route.setNodes(new ArrayList<>());
-        route.setSteps(new ArrayList<>());
+        route.setTotalDistance(pathResult.totalDistance);
+        route.setEstimatedDuration(pathResult.totalDistance / 25.0 * 60.0); // 25 km/h
+        route.setRouteSummary(String.format(
+            "Dijkstra: %.2f km qua %d điểm", 
+            pathResult.totalDistance, 
+            pathResult.path.size()
+        ));
+        route.setSteps(steps);
+//        route.setNodes(new ArrayList<>());
         
         return route;
     }
     
     /**
-     * Tạo route đường thẳng (fallback)
+     * Tạo route fallback (đường thẳng) khi không tìm được đường
      */
-    private DeliveryRoute createDirectRoute(Double latStart, Double lonStart, 
-                                           Double latEnd, Double lonEnd) {
+    private DeliveryRoute createFallbackRoute(Double latStart, Double lonStart, 
+                                             Double latEnd, Double lonEnd) {
+        
         DeliveryRoute route = new DeliveryRoute();
         
         List<double[]> coordinates = new ArrayList<>();
@@ -225,18 +289,24 @@ public class DijkstraService {
         
         route.setCoordinates(coordinates);
         route.setTotalDistance(distance);
-        route.setRouteSummary("Đường thẳng (fallback): " + String.format("%.2f", distance) + " km");
-        route.setNodes(new ArrayList<>());
+        route.setEstimatedDuration(distance / 25.0 * 60.0);
+        route.setRouteSummary(String.format(
+            "⚠️ Khoảng cách đường chim bay: %.2f km (Không tìm thấy đường trên bản đồ)", 
+            distance
+        ));
         route.setSteps(new ArrayList<>());
+//        route.setNodes(new ArrayList<>());
+        
+        log.warn("⚠️ Fallback route: {:.2f} km", distance);
         
         return route;
     }
     
     /**
-     * Tính khoảng cách Haversine
+     * Haversine formula - Tính khoảng cách giữa 2 GPS coordinates
      */
     public Double calculateDistance(Double lat1, Double lon1, Double lat2, Double lon2) {
-        final int R = 6371;
+        final int R = 6371; // Bán kính Trái Đất (km)
         
         Double latDistance = Math.toRadians(lat2 - lat1);
         Double lonDistance = Math.toRadians(lon2 - lon1);
@@ -250,8 +320,15 @@ public class DijkstraService {
         return R * c;
     }
     
-    // ==================== Inner Classes ====================
+    /**
+     * ================================
+     * INNER CLASSES
+     * ================================
+     */
     
+    /**
+     * Node + Distance trong priority queue
+     */
     private static class NodeDistance {
         int node;
         double distance;
@@ -262,8 +339,11 @@ public class DijkstraService {
         }
     }
     
-    private static class DijkstraResult {
-        List<Integer> path;
-        double totalDistance;
+    /**
+     * Kết quả của thuật toán tìm đường
+     */
+    private static class PathResult {
+        List<Integer> path;         // Danh sách node IDs
+        double totalDistance;       // km
     }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeliveryRoute {
-    private List<GraphNode> nodes = new ArrayList<>();
+
     private List<double[]> coordinates = new ArrayList<>();
     private Double totalDistance; // km
     private Double estimatedDuration; // minutes

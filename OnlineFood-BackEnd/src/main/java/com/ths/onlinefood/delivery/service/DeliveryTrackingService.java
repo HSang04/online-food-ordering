@@ -1,8 +1,4 @@
-
 package com.ths.onlinefood.delivery.service;
-
-import java.util.Map;
-import java.util.HashMap;
 
 import com.ths.onlinefood.delivery.dto.LocationUpdateRequest;
 import com.ths.onlinefood.delivery.dto.TrackingResponse;
@@ -18,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,9 +28,6 @@ public class DeliveryTrackingService {
     private final DonHangRepository donHangRepository;
     private final DijkstraService dijkstraService;
     
-    /**
-     * Cập nhật vị trí shipper
-     */
     @Transactional
     public DeliveryLocation updateLocation(LocationUpdateRequest request) {
         DonHang donHang = donHangRepository.findById(request.getDonHangId())
@@ -56,15 +51,11 @@ public class DeliveryTrackingService {
                  request.getDonHangId(), request.getLatitude(), 
                  request.getLongitude(), request.getStatus());
         
-        // Kiểm tra xem đã gần đến khách chưa
         checkNearCustomer(donHang, request.getLatitude(), request.getLongitude());
         
         return saved;
     }
     
-    /**
-     * Lấy vị trí hiện tại của shipper
-     */
     public TrackingResponse getCurrentLocation(Long donHangId) {
         DonHang donHang = donHangRepository.findById(donHangId)
             .orElseThrow(() -> new IllegalArgumentException("Đơn hàng không tồn tại"));
@@ -79,9 +70,6 @@ public class DeliveryTrackingService {
         return convertToTrackingResponse(location, donHang);
     }
     
-    /**
-     * Lấy lịch sử di chuyển
-     */
     public List<TrackingResponse> getLocationHistory(Long donHangId, Integer hours) {
         DonHang donHang = donHangRepository.findById(donHangId)
             .orElseThrow(() -> new IllegalArgumentException("Đơn hàng không tồn tại"));
@@ -94,9 +82,6 @@ public class DeliveryTrackingService {
             .collect(Collectors.toList());
     }
     
-    /**
-     * Lấy tất cả vị trí của đơn hàng
-     */
     public List<DeliveryLocation> getAllLocations(Long donHangId) {
         DonHang donHang = donHangRepository.findById(donHangId)
             .orElseThrow(() -> new IllegalArgumentException("Đơn hàng không tồn tại"));
@@ -104,29 +89,22 @@ public class DeliveryTrackingService {
         return locationRepository.findByDonHangOrderByTimestampDesc(donHang);
     }
     
-    /**
-     * Kiểm tra shipper đã gần khách hàng chưa
-     */
     private void checkNearCustomer(DonHang donHang, Double currentLat, Double currentLon) {
         if (donHang.getLatGiaoHang() == null || donHang.getLonGiaoHang() == null) {
             return;
         }
         
+        // ✅ Sử dụng calculateDistance từ DijkstraService
         Double distance = dijkstraService.calculateDistance(
             currentLat, currentLon,
             donHang.getLatGiaoHang(), donHang.getLonGiaoHang()
         );
         
-        // Nếu trong bán kính 500m
         if (distance < 0.5) {
             log.info("Shipper đã gần đến khách hàng ({}m)", Math.round(distance * 1000));
-            // Có thể gửi notification ở đây
         }
     }
     
-    /**
-     * Convert DeliveryLocation sang TrackingResponse
-     */
     private TrackingResponse convertToTrackingResponse(DeliveryLocation location, DonHang donHang) {
         TrackingResponse response = new TrackingResponse();
         response.setDonHangId(donHang.getId());
@@ -137,7 +115,7 @@ public class DeliveryTrackingService {
         response.setHeading(location.getHeading());
         response.setStatus(location.getStatus());
         
-        // Tính khoảng cách đến khách hàng
+        // ✅ Tính khoảng cách đường chim bay (không dùng Dijkstra vì quá chậm)
         if (donHang.getLatGiaoHang() != null && donHang.getLonGiaoHang() != null) {
             Double distance = dijkstraService.calculateDistance(
                 location.getLatitude(), location.getLongitude(),
@@ -145,8 +123,7 @@ public class DeliveryTrackingService {
             );
             response.setDistanceToCustomer(distance);
             
-            // Tính thời gian dự kiến (vận tốc trung bình 25 km/h)
-            Double eta = (distance / 25.0) * 60.0; // phút
+            Double eta = (distance / 25.0) * 60.0;
             response.setEstimatedArrivalTime(eta);
         }
         
@@ -156,9 +133,6 @@ public class DeliveryTrackingService {
         return response;
     }
     
-    /**
-     * Tạo response khi chưa có tracking
-     */
     private TrackingResponse createNoTrackingResponse(Long donHangId) {
         TrackingResponse response = new TrackingResponse();
         response.setDonHangId(donHangId);
@@ -166,9 +140,6 @@ public class DeliveryTrackingService {
         return response;
     }
     
-    /**
-     * Lấy thông báo trạng thái
-     */
     private String getStatusMessage(DeliveryStatus status, Double distance) {
         String message = switch (status) {
             case WAITING -> "Đang chờ shipper nhận đơn";
@@ -191,9 +162,6 @@ public class DeliveryTrackingService {
         return message;
     }
     
-    /**
-     * Xóa dữ liệu tracking cũ (chạy định kỳ)
-     */
     @Transactional
     public void cleanOldTrackingData(Integer daysToKeep) {
         LocalDateTime before = LocalDateTime.now().minusDays(daysToKeep != null ? daysToKeep : 30);
@@ -201,9 +169,6 @@ public class DeliveryTrackingService {
         log.info("Đã xóa dữ liệu tracking cũ hơn {} ngày", daysToKeep);
     }
     
-    /**
-     * Lấy thống kê tracking
-     */
     public Map<String, Object> getTrackingStats(Long donHangId) {
         Long totalUpdates = locationRepository.countByDonHangId(donHangId);
         List<DeliveryLocation> locations = getAllLocations(donHangId);
@@ -222,7 +187,6 @@ public class DeliveryTrackingService {
             stats.put("lastUpdate", last.getTimestamp());
             stats.put("currentStatus", last.getStatus());
             
-            // Tính tổng quãng đường đã đi
             Double totalDistance = 0.0;
             for (int i = 0; i < locations.size() - 1; i++) {
                 DeliveryLocation loc1 = locations.get(i + 1);
@@ -234,7 +198,6 @@ public class DeliveryTrackingService {
             }
             stats.put("totalDistanceTraveled", String.format("%.2f km", totalDistance));
             
-            // Tốc độ trung bình
             if (minutes > 0) {
                 Double avgSpeed = (totalDistance / minutes) * 60.0;
                 stats.put("averageSpeed", String.format("%.1f km/h", avgSpeed));
