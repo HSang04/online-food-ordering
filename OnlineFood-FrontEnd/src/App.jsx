@@ -33,6 +33,7 @@ import QuanLyCuaHang from './pages/Admin/QuanLyCuaHang/QuanLyCuaHang';
 import QuanLyGiaoDich from './pages/Admin/QuanLyGiaoDich/QuanLyGiaoDich';
 
 import TestMap from './pages/GiaoHang/TestMap/TestMap';
+import TestMapBMSSP  from './pages/GiaoHang/TestMap/TestMapBBSSP';
 
 const App = () => {
   return (
@@ -76,6 +77,7 @@ const App = () => {
           <Route path="/thong-ke" element={<RequireAdmin><ThongKe /></RequireAdmin>} />
 
           <Route path="/test-map" element={<TestMap />} />
+          <Route path="/test-bmssp" element={<TestMapBMSSP />} />
 
         </Routes>
       </div>

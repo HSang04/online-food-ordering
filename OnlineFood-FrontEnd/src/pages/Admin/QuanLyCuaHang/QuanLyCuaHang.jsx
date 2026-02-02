@@ -12,9 +12,12 @@ const QuanLyCuaHang = () => {
     diaChi: '',
     soDienThoai: '',
     gioMoCua: '',
-    gioDongCua: ''
+    gioDongCua: '',
+    viDo: '',
+    kinhDo: ''
   });
   const [cuaHangStatus, setCuaHangStatus] = useState(null);
+  const [showCoordinateInput, setShowCoordinateInput] = useState(false);
  
   const getAuthToken = () => {
     return localStorage.getItem('jwt');
@@ -110,19 +113,25 @@ const QuanLyCuaHang = () => {
       diaChi: cuaHang.diaChi || '',
       soDienThoai: cuaHang.soDienThoai || '',
       gioMoCua: cuaHang.gioMoCua?.substring(0, 5) || '',
-      gioDongCua: cuaHang.gioDongCua?.substring(0, 5) || ''
+      gioDongCua: cuaHang.gioDongCua?.substring(0, 5) || '',
+      viDo: cuaHang.viDo || '',
+      kinhDo: cuaHang.kinhDo || ''
     });
     setIsEditing(true);
+    setShowCoordinateInput(false);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
+    setShowCoordinateInput(false);
     setFormData({
       ten: '',
       diaChi: '',
       soDienThoai: '',
       gioMoCua: '',
-      gioDongCua: ''
+      gioDongCua: '',
+      viDo: '',
+      kinhDo: ''
     });
   };
 
@@ -152,16 +161,39 @@ const QuanLyCuaHang = () => {
       return false;
     }
     
-   
     if (isNaN(formData.soDienThoai.replace(/\s/g, ''))) {
       alert('Số điện thoại chỉ được chứa số');
       return false;
     }
     
-   
     if (formData.gioMoCua >= formData.gioDongCua) {
       alert('Giờ mở cửa phải trước giờ đóng cửa');
       return false;
+    }
+
+    // Validate tọa độ nếu đang nhập
+    if (showCoordinateInput) {
+      if (!formData.viDo || !formData.kinhDo) {
+        alert('Vui lòng nhập đầy đủ Vĩ độ và Kinh độ');
+        return false;
+      }
+      const viDo = parseFloat(formData.viDo);
+      const kinhDo = parseFloat(formData.kinhDo);
+      
+      if (isNaN(viDo) || isNaN(kinhDo)) {
+        alert('Vĩ độ và Kinh độ phải là số');
+        return false;
+      }
+      
+      if (viDo < -90 || viDo > 90) {
+        alert('Vĩ độ phải từ -90 đến 90');
+        return false;
+      }
+      
+      if (kinhDo < -180 || kinhDo > 180) {
+        alert('Kinh độ phải từ -180 đến 180');
+        return false;
+      }
     }
     
     return true;
@@ -177,10 +209,18 @@ const QuanLyCuaHang = () => {
     try {
       const jwt = getAuthToken();
       const dataToSend = {
-        ...formData,
+        ten: formData.ten,
+        diaChi: formData.diaChi,
+        soDienThoai: formData.soDienThoai,
         gioMoCua: formData.gioMoCua + ':00',
         gioDongCua: formData.gioDongCua + ':00'
       };
+
+      // Thêm tọa độ nếu người dùng nhập
+      if (showCoordinateInput && formData.viDo && formData.kinhDo) {
+        dataToSend.viDo = parseFloat(formData.viDo);
+        dataToSend.kinhDo = parseFloat(formData.kinhDo);
+      }
 
       const response = await axios.put('/thong-tin-cua-hang', dataToSend, {
         headers: {
@@ -193,26 +233,37 @@ const QuanLyCuaHang = () => {
       
       alert('Cập nhật thông tin thành công!');
       setIsEditing(false);
+      setShowCoordinateInput(false);
       
-     
       await fetchCuaHangStatus();
       
     } catch (err) {
       console.error('Lỗi khi cập nhật:', err);
+      
+      const errorMsg = err.response?.data;
       
       if (err.response?.status === 401) {
         alert('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
       } else if (err.response?.status === 403) {
         alert('Bạn không có quyền cập nhật thông tin này.');
       } else if (err.response?.status === 400) {
-        alert('Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.');
+        // Hiển thị thông báo lỗi từ server
+        if (typeof errorMsg === 'string' && errorMsg.includes('Khong tim thay toa do')) {
+          const confirmManual = window.confirm(
+            errorMsg + '\n\nBạn có muốn nhập tọa độ thủ công không?'
+          );
+          if (confirmManual) {
+            setShowCoordinateInput(true);
+          }
+        } else {
+          alert(errorMsg || 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.');
+        }
       } else {
         alert('Có lỗi xảy ra khi cập nhật thông tin. Vui lòng thử lại.');
       }
     }
   };
 
- 
   const handleRetry = () => {
     setError(null);
     fetchCuaHang();
@@ -244,14 +295,14 @@ const QuanLyCuaHang = () => {
 
   return (
     <div className="quanlycuahang-container">
-      <h2> Quản Lý Thông Tin Cửa Hàng</h2>
+      <h2>⚙️ Quản Lý Thông Tin Cửa Hàng</h2>
     
       {cuaHangStatus && (
         <div className={`quanlycuahang-status-card ${cuaHangStatus.isOpen ? 'quanlycuahang-open' : 'quanlycuahang-closed'}`}>
           <div className="quanlycuahang-status-indicator">
             <span className={`quanlycuahang-status-dot ${cuaHangStatus.isOpen ? 'quanlycuahang-open' : 'quanlycuahang-closed'}`}></span>
             <span className="quanlycuahang-status-text">
-              {cuaHangStatus.isOpen ? ' ĐANG MỞ CỬA' : ' ĐANG ĐÓNG CỬA'}
+              {cuaHangStatus.isOpen ? '🟢 ĐANG MỞ CỬA' : '🔴 ĐANG ĐÓNG CỬA'}
             </span>
           </div>
           <p className="quanlycuahang-status-info">{cuaHangStatus.thongTin}</p>
@@ -260,7 +311,7 @@ const QuanLyCuaHang = () => {
 
       <div className="quanlycuahang-info-card">
         <div className="quanlycuahang-card-header">
-          <h3>Thông tin cửa hàng</h3>
+          <h3>📋 Thông tin cửa hàng</h3>
           {!isEditing && (
             <button className="quanlycuahang-btn-edit" onClick={handleEdit}>
               ✏️ Chỉnh sửa
@@ -293,7 +344,11 @@ const QuanLyCuaHang = () => {
                 rows={3}
                 required
                 maxLength="255"
+                placeholder="Nhập địa chỉ chi tiết (số nhà, đường, phường/xã, quận/huyện, thành phố)"
               />
+              <small style={{color: '#666', fontSize: '0.85em'}}>
+                💡 Địa chỉ càng chi tiết càng tìm được tọa độ chính xác
+              </small>
             </div>
 
             <div className="quanlycuahang-form-group">
@@ -335,12 +390,60 @@ const QuanLyCuaHang = () => {
               </div>
             </div>
 
+            {/* Toggle nhập tọa độ thủ công */}
+            <div className="quanlycuahang-form-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={showCoordinateInput}
+                  onChange={(e) => setShowCoordinateInput(e.target.checked)}
+                />
+                {' '}Nhập tọa độ thủ công (Vĩ độ, Kinh độ)
+              </label>
+            </div>
+
+            {showCoordinateInput && (
+              <div className="quanlycuahang-form-row">
+                <div className="quanlycuahang-form-group">
+                  <label htmlFor="viDo">Vĩ độ (Latitude):</label>
+                  <input
+                    id="viDo"
+                    type="number"
+                    step="any"
+                    name="viDo"
+                    value={formData.viDo}
+                    onChange={handleInputChange}
+                    placeholder="Ví dụ: 10.762622"
+                  />
+                  <small style={{color: '#666', fontSize: '0.85em'}}>
+                    📍 Từ -90 đến 90
+                  </small>
+                </div>
+
+                <div className="quanlycuahang-form-group">
+                  <label htmlFor="kinhDo">Kinh độ (Longitude):</label>
+                  <input
+                    id="kinhDo"
+                    type="number"
+                    step="any"
+                    name="kinhDo"
+                    value={formData.kinhDo}
+                    onChange={handleInputChange}
+                    placeholder="Ví dụ: 106.660172"
+                  />
+                  <small style={{color: '#666', fontSize: '0.85em'}}>
+                    📍 Từ -180 đến 180
+                  </small>
+                </div>
+              </div>
+            )}
+
             <div className="quanlycuahang-form-actions">
               <button type="submit" className="quanlycuahang-btn-save">
-                 Lưu thay đổi
+                💾 Lưu thay đổi
               </button>
               <button type="button" className="quanlycuahang-btn-cancel" onClick={handleCancel}>
-                 Hủy
+                ❌ Hủy
               </button>
             </div>
           </form>
@@ -367,6 +470,15 @@ const QuanLyCuaHang = () => {
                 {cuaHang?.gioMoCua?.substring(0, 5)} - {cuaHang?.gioDongCua?.substring(0, 5)}
               </span>
             </div>
+
+            {cuaHang?.viDo && cuaHang?.kinhDo && (
+              <div className="quanlycuahang-info-item">
+                <span className="quanlycuahang-label">Tọa độ:</span>
+                <span className="quanlycuahang-value">
+                  📍 {cuaHang.viDo.toFixed(6)}, {cuaHang.kinhDo.toFixed(6)}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>

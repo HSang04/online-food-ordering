@@ -85,7 +85,7 @@ const TestMap = () => {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/delivery/route/shortest-path?` + 
+        `${API_BASE_URL}/delivery/route/dijkstra/shortest-path?` + 
         `latStart=${latStart}&lonStart=${lonStart}&latEnd=${latEnd}&lonEnd=${lonEnd}`
       );
 

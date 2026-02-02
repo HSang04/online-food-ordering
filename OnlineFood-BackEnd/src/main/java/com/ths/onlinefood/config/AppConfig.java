@@ -29,6 +29,7 @@ public class AppConfig {
             .authorizeHttpRequests(authz -> authz
                     
                   .requestMatchers("/api/delivery/**").permitAll()   
+                     .requestMatchers("/api/delivery/route/bmssp/**").permitAll()
               
                 .requestMatchers("/auth/signup", "/auth/login").permitAll()
                 .requestMatchers("/auth/signup-by-admin").hasAnyAuthority("ADMIN", "QUANLY")

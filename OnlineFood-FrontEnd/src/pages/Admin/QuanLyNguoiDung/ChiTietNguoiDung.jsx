@@ -32,6 +32,7 @@ const ChiTietNguoiDung = () => {
     QUANLY: 'Quản lý',
     NHANVIEN_QUANLYDONHANG: 'NV Quản lý đơn hàng',
     NHANVIEN_QUANLYMONAN: 'NV Quản lý món ăn',
+    NHANVIEN_GIAOHANG: 'NV Giao hàng',
     KHACHHANG: 'Khách hàng'
   };
 

@@ -52,6 +52,12 @@ public class ThongTinCuaHang {
     @JsonIgnore  // Ẩn khỏi JSON response
     private LocalDateTime ngayCapNhat;
     
+     @Column(name = "vi_do")
+    private Double viDo;
+
+    @Column(name = "kinh_do")
+    private Double kinhDo;
+    
     // Timezone cho Việt Nam (GMT+7)
     private static final ZoneId VIETNAM_TIMEZONE = ZoneId.of("Asia/Ho_Chi_Minh");
     

@@ -42,6 +42,7 @@ public class ThongTinCuaHangController {
     public ResponseEntity<?> updateCuaHang(@RequestBody ThongTinCuaHang cuaHang) {
         try {
             ThongTinCuaHang updated = service.updateCuaHang(cuaHang);
+            System.out.println("ĐỊA CHỈ NHẬN ĐƯỢC = " + cuaHang.getDiaChi());
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
