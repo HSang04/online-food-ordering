@@ -1061,4 +1061,24 @@
     align-items: flex-start;
   }
   
-  
+
+.ql-don-hang-order-shipper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  background: #e3f2fd;
+  border-radius: 8px;
+  border-left: 3px solid #2196f3;
+}
+
+.ql-don-hang-shipper-icon {
+  font-size: 16px;
+}
+
+.ql-don-hang-shipper-text {
+  font-size: 14px;
+  color: #1565c0;
+  font-weight: 600;
+}

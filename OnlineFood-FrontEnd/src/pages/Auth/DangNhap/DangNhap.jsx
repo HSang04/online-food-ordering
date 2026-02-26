@@ -39,7 +39,11 @@ const DangNhap = () => {
           localStorage.setItem('jwt', response.data.jwt);
           localStorage.setItem('idNguoiDung', response.data.id);
           localStorage.setItem('vaiTro', response.data.role);
-          navigate('/');
+          if (response.data.role === 'NHANVIEN_GIAOHANG') {
+            navigate('/quan-ly/giao-hang');
+          } else {
+            navigate('/');
+          }
         }
       } catch (error) {
         const errorMessage =

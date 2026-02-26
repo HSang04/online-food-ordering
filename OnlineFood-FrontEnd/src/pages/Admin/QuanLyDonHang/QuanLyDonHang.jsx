@@ -8,14 +8,14 @@ const QuanLyDonHang = () => {
   const [donHangs, setDonHangs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState("all"); 
+  const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [loadingInvoice, setLoadingInvoice] = useState({});
-  
+
   const [isAutoRefreshing, setIsAutoRefreshing] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState(null);
   const intervalRef = useRef(null);
@@ -24,7 +24,7 @@ const QuanLyDonHang = () => {
 
   const ORDER_STATUS = {
     DANG_XU_LY: "DANG_XU_LY",
-    DANG_LAM: "DANG_LAM", 
+    DANG_LAM: "DANG_LAM",
     DANG_GIAO: "DANG_GIAO",
     HOAN_THANH: "HOAN_THANH",
     DA_HUY: "DA_HUY"
@@ -33,7 +33,7 @@ const QuanLyDonHang = () => {
   const STATUS_LABELS = {
     "Đang xử lý": "Đang xử lý",
     "Đang làm": "Đang làm",
-    "Đang giao": "Đang giao", 
+    "Đang giao": "Đang giao",
     "Hoàn thành": "Hoàn thành",
     "Đã hủy": "Đã hủy",
     [ORDER_STATUS.DANG_XU_LY]: "Đang xử lý",
@@ -45,7 +45,7 @@ const QuanLyDonHang = () => {
 
   const STATUS_COLORS = {
     "Đang xử lý": "#ffa500",
-    "Đang làm": "#2196f3", 
+    "Đang làm": "#2196f3",
     "Đang giao": "#9c27b0",
     "Hoàn thành": "#4caf50",
     "Đã hủy": "#f44336",
@@ -60,13 +60,11 @@ const QuanLyDonHang = () => {
     try {
       setLoading(true);
       const response = await axios.get("/don-hang", {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
+        headers: { Authorization: `Bearer ${jwt}` }
       });
-      
+
       if (response.data) {
-        const sortedOrders = response.data.sort((a, b) => 
+        const sortedOrders = response.data.sort((a, b) =>
           new Date(b.ngayTao) - new Date(a.ngayTao)
         );
         setDonHangs(sortedOrders);
@@ -83,21 +81,19 @@ const QuanLyDonHang = () => {
     try {
       setIsAutoRefreshing(true);
       const response = await axios.get("/don-hang", {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
+        headers: { Authorization: `Bearer ${jwt}` }
       });
-      
+
       if (response.data) {
-        const sortedOrders = response.data.sort((a, b) => 
+        const sortedOrders = response.data.sort((a, b) =>
           new Date(b.ngayTao) - new Date(a.ngayTao)
         );
-        
+
         setDonHangs(prevOrders => {
           const hasChanges = JSON.stringify(prevOrders) !== JSON.stringify(sortedOrders);
           return hasChanges ? sortedOrders : prevOrders;
         });
-        
+
         setLastRefreshTime(new Date());
       }
     } catch (err) {
@@ -146,45 +142,39 @@ const QuanLyDonHang = () => {
   const fetchOrderDetails = async (orderId) => {
     try {
       setLoadingDetails(true);
-      console.log("Đang lấy chi tiết đơn hàng:", orderId);
-      
+
       const response = await axios.get(`/chi-tiet-don-hang/don-hang/${orderId}`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
+        headers: { Authorization: `Bearer ${jwt}` }
       });
-      
+
       if (response.data && Array.isArray(response.data)) {
         const chiTietList = response.data;
         const donHangInfo = chiTietList.length > 0 ? chiTietList[0].donHang : null;
-        
+
         if (!donHangInfo) {
           throw new Error("Không tìm thấy thông tin đơn hàng");
         }
-        
+
         const processedChiTiet = chiTietList.map(item => ({
           ...item,
           monAnId: item.monAn?.id || item.monAnId,
-          gia: item.donGia || item.gia, 
+          gia: item.donGia || item.gia,
           thanhTien: (item.donGia || item.gia || 0) * (item.soLuong || 0)
         }));
-        
+
         const completeOrder = {
           ...donHangInfo,
           chiTietDonHang: processedChiTiet,
-          tongTienGoc: processedChiTiet.reduce((sum, item) => 
+          tongTienGoc: processedChiTiet.reduce((sum, item) =>
             sum + (item.thanhTien || 0), 0
           )
         };
-        
-        console.log("Đơn hàng sau khi xử lý:", completeOrder);
+
         setSelectedOrder(completeOrder);
       } else {
-        console.warn("API trả về dữ liệu không đúng định dạng");
         const orderFromList = donHangs.find(order => order.id === orderId);
         if (orderFromList) {
           setSelectedOrder(orderFromList);
-          console.log("Sử dụng dữ liệu từ danh sách:", orderFromList);
         } else {
           throw new Error("Không tìm thấy thông tin đơn hàng");
         }
@@ -194,7 +184,6 @@ const QuanLyDonHang = () => {
       const orderFromList = donHangs.find(order => order.id === orderId);
       if (orderFromList) {
         setSelectedOrder(orderFromList);
-        console.log("API lỗi, sử dụng dữ liệu từ danh sách:", orderFromList);
       } else {
         alert("Không thể tải chi tiết đơn hàng. Vui lòng thử lại!");
         setSelectedOrder(null);
@@ -204,83 +193,76 @@ const QuanLyDonHang = () => {
     }
   };
 
-const handleViewInvoice = async (orderId) => {
-  try {
-    setLoadingInvoice(prev => ({ ...prev, [orderId]: true }));
-    
-    
-    const vaiTro = localStorage.getItem("vaiTro");
-    
-    const headers = {
-      Authorization: `Bearer ${jwt}`,
-      'User-Email': 'admin@system.com', 
-      'User-Role': vaiTro
-    };
-    
-    const response = await axios.get(`/hoa-don/don-hang/${orderId}`, {
-      headers: headers,
-    });
-    
-    if (response.data) {
-      navigate(`/hoa-don/${orderId}`);
-    } else {
-      alert("Hóa đơn chưa được tạo cho đơn hàng này!");
-    }
-  } catch (err) {
-    console.error("Lỗi khi kiểm tra hóa đơn:", err);
-    if (err.response?.status === 404) {
-     
-      try {
-        const createResponse = await axios.post(`/hoa-don/tao-tu-don-hang/${orderId}`, {}, {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        });
-        
-        if (createResponse.data) {
-          console.log("Đã tạo hóa đơn COD cho đơn hàng:", orderId);
-          navigate(`/hoa-don/${orderId}`);
-        }
-      } catch (createErr) {
-        console.error("Lỗi khi tạo hóa đơn:", createErr);
-        if (createErr.response?.data?.message) {
-          alert(createErr.response.data.message);
-        } else {
-          alert("Không thể tạo hóa đơn. Vui lòng thử lại!");
-        }
+  const handleViewInvoice = async (orderId) => {
+    try {
+      setLoadingInvoice(prev => ({ ...prev, [orderId]: true }));
+
+      const vaiTro = localStorage.getItem("vaiTro");
+      const headers = {
+        Authorization: `Bearer ${jwt}`,
+        "User-Email": "admin@system.com",
+        "User-Role": vaiTro
+      };
+
+      const response = await axios.get(`/hoa-don/don-hang/${orderId}`, { headers });
+
+      if (response.data) {
+        navigate(`/hoa-don/${orderId}`);
+      } else {
+        alert("Hóa đơn chưa được tạo cho đơn hàng này!");
       }
-    } else if (err.response?.status === 401) {
-      alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
-    } else if (err.response?.status === 403) {
-      alert("Bạn không có quyền xem hóa đơn này!");
-    } else {
-      alert("Không thể truy cập hóa đơn. Vui lòng thử lại!");
+    } catch (err) {
+      console.error("Lỗi khi kiểm tra hóa đơn:", err);
+      if (err.response?.status === 404) {
+        try {
+          const createResponse = await axios.post(
+            `/hoa-don/tao-tu-don-hang/${orderId}`,
+            {},
+            { headers: { Authorization: `Bearer ${jwt}` } }
+          );
+          if (createResponse.data) {
+            navigate(`/hoa-don/${orderId}`);
+          }
+        } catch (createErr) {
+          if (createErr.response?.data?.message) {
+            alert(createErr.response.data.message);
+          } else {
+            alert("Không thể tạo hóa đơn. Vui lòng thử lại!");
+          }
+        }
+      } else if (err.response?.status === 401) {
+        alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+      } else if (err.response?.status === 403) {
+        alert("Bạn không có quyền xem hóa đơn này!");
+      } else {
+        alert("Không thể truy cập hóa đơn. Vui lòng thử lại!");
+      }
+    } finally {
+      setLoadingInvoice(prev => ({ ...prev, [orderId]: false }));
     }
-  } finally {
-    setLoadingInvoice(prev => ({ ...prev, [orderId]: false }));
-  }
-};
+  };
 
   const normalizeStatus = (status) => {
     const statusMap = {
       "Đang xử lý": "dang_xu_ly",
       "Đang làm": "dang_lam",
-      "Đang giao": "dang_giao", 
+      "Đang giao": "dang_giao",
       "Hoàn thành": "hoan_thanh",
       "Đã hủy": "da_huy"
     };
-    return statusMap[status] || status.toLowerCase().replace(/\s+/g, '_');
+    return statusMap[status] || status.toLowerCase().replace(/\s+/g, "_");
   };
 
   const filteredOrders = donHangs.filter(order => {
     const normalizedStatus = normalizeStatus(order.trangThai);
     const matchesFilter = filter === "all" || normalizedStatus === filter;
-    const matchesSearch = searchTerm === "" || 
+    const matchesSearch =
+      searchTerm === "" ||
       order.id.toString().includes(searchTerm) ||
       order.nguoiDung?.hoTen?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.nguoiDung?.tenNguoiDung?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.diaChiGiaoHang?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     return matchesFilter && matchesSearch;
   });
 
@@ -292,53 +274,44 @@ const handleViewInvoice = async (orderId) => {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       setUpdating(true);
-      
-      const response = await axios.patch(`/don-hang/trang-thai/${orderId}`, {
-        trangThai: newStatus
-      }, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          'Content-Type': 'application/json'
-        },
-      });
+
+      const response = await axios.patch(
+        `/don-hang/trang-thai/${orderId}`,
+        { trangThai: newStatus },
+        { headers: { Authorization: `Bearer ${jwt}`, "Content-Type": "application/json" } }
+      );
 
       if (response.data) {
         if (newStatus === "HOAN_THANH") {
           try {
             await axios.put(`/hoa-don/cap-nhat-hoan-thanh/${orderId}`, {}, {
-              headers: {
-                Authorization: `Bearer ${jwt}`,
-              },
+              headers: { Authorization: `Bearer ${jwt}` }
             });
-            console.log("Đã cập nhật trạng thái hóa đơn thành DA_THANH_TOAN");
           } catch (invoiceError) {
             console.error("Lỗi khi cập nhật hóa đơn:", invoiceError);
           }
         }
 
-        setDonHangs(prev => prev.map(order => 
-          order.id === orderId 
-            ? { ...order, trangThai: newStatus }
-            : order
-        ));
-        
+        setDonHangs(prev =>
+          prev.map(order =>
+            order.id === orderId ? { ...order, trangThai: newStatus } : order
+          )
+        );
+
         if (selectedOrder && selectedOrder.id === orderId) {
           setSelectedOrder(prev => ({ ...prev, trangThai: newStatus }));
         }
-        
-        const statusMessage = newStatus === "HOAN_THANH" 
-          ? "Đơn hàng đã hoàn thành và hóa đơn đã được cập nhật trạng thái thanh toán!"
-          : `Cập nhật trạng thái đơn hàng #${orderId} thành công!`;
-        
+
+        const statusMessage =
+          newStatus === "HOAN_THANH"
+            ? "Đơn hàng đã hoàn thành và hóa đơn đã được cập nhật trạng thái thanh toán!"
+            : `Cập nhật trạng thái đơn hàng #${orderId} thành công!`;
+
         alert(statusMessage);
-        
-        setTimeout(() => {
-          silentRefresh();
-        }, 1000);
+        setTimeout(() => silentRefresh(), 1000);
       }
     } catch (err) {
       console.error("Lỗi khi cập nhật trạng thái:", err);
-      
       if (err.response?.status === 400) {
         alert("Trạng thái không hợp lệ. Vui lòng thử lại!");
       } else if (err.response?.status === 404) {
@@ -353,12 +326,12 @@ const handleViewInvoice = async (orderId) => {
 
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
-    return date.toLocaleString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
     });
   };
 
@@ -413,59 +386,47 @@ const handleViewInvoice = async (orderId) => {
   return (
     <div className="ql-don-hang-quan-ly-don-hang-container">
       <header className="ql-don-hang-page-header">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h1 className="ql-don-hang-page-title">📋 Quản lý đơn hàng</h1>
-          
-          {/* Indicator trạng thái auto refresh */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {isAutoRefreshing && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                 <div style={{
-                  width: '8px',
-                  height: '8px',
-                  backgroundColor: '#4caf50',
-                  borderRadius: '50%',
-                  animation: 'ql-don-hang-pulse 1.5s infinite'
+                  width: "8px", height: "8px",
+                  backgroundColor: "#4caf50", borderRadius: "50%",
+                  animation: "ql-don-hang-pulse 1.5s infinite"
                 }}></div>
-                <span style={{ fontSize: '12px', color: '#666' }}>Đang cập nhật...</span>
+                <span style={{ fontSize: "12px", color: "#666" }}>Đang cập nhật...</span>
               </div>
             )}
-            
             {lastRefreshTime && (
-              <span style={{ fontSize: '12px', color: '#999' }}>
-                Cập nhật: {lastRefreshTime.toLocaleTimeString('vi-VN')}
+              <span style={{ fontSize: "12px", color: "#999" }}>
+                Cập nhật: {lastRefreshTime.toLocaleTimeString("vi-VN")}
               </span>
             )}
           </div>
         </div>
-        
+
         <div className="ql-don-hang-stats-row">
           <div className="ql-don-hang-stat-card">
             <span className="ql-don-hang-stat-number">{donHangs.length}</span>
             <span className="ql-don-hang-stat-label">Tổng đơn</span>
           </div>
           <div className="ql-don-hang-stat-card ql-don-hang-processing">
-            <span className="ql-don-hang-stat-number">
-              {getOrderCountByStatus("dang_xu_ly")}
-            </span>
+            <span className="ql-don-hang-stat-number">{getOrderCountByStatus("dang_xu_ly")}</span>
             <span className="ql-don-hang-stat-label">Đang xử lý</span>
           </div>
           <div className="ql-don-hang-stat-card ql-don-hang-preparing">
-            <span className="ql-don-hang-stat-number">
-              {getOrderCountByStatus("dang_lam")}
-            </span>
+            <span className="ql-don-hang-stat-number">{getOrderCountByStatus("dang_lam")}</span>
             <span className="ql-don-hang-stat-label">Đang làm</span>
           </div>
           <div className="ql-don-hang-stat-card ql-don-hang-delivering">
-            <span className="ql-don-hang-stat-number">
-              {getOrderCountByStatus("dang_giao")}
-            </span>
+            <span className="ql-don-hang-stat-number">{getOrderCountByStatus("dang_giao")}</span>
             <span className="ql-don-hang-stat-label">Đang giao</span>
           </div>
           <div className="ql-don-hang-stat-card ql-don-hang-completed">
-            <span className="ql-don-hang-stat-number">
-              {getOrderCountByStatus("hoan_thanh")}
-            </span>
+            <span className="ql-don-hang-stat-number">{getOrderCountByStatus("hoan_thanh")}</span>
             <span className="ql-don-hang-stat-label">Hoàn thành</span>
           </div>
         </div>
@@ -484,42 +445,22 @@ const handleViewInvoice = async (orderId) => {
         </div>
 
         <div className="ql-don-hang-filter-tabs">
-          <button 
-            className={`ql-don-hang-filter-tab ${filter === "all" ? "ql-don-hang-active" : ""}`}
-            onClick={() => setFilter("all")}
-          >
-            Tất cả ({getOrderCountByStatus("all")})
-          </button>
-          <button 
-            className={`ql-don-hang-filter-tab ${filter === "dang_xu_ly" ? "ql-don-hang-active" : ""}`}
-            onClick={() => setFilter("dang_xu_ly")}
-          >
-            Đang xử lý ({getOrderCountByStatus("dang_xu_ly")})
-          </button>
-          <button 
-            className={`ql-don-hang-filter-tab ${filter === "dang_lam" ? "ql-don-hang-active" : ""}`}
-            onClick={() => setFilter("dang_lam")}
-          >
-            Đang làm ({getOrderCountByStatus("dang_lam")})
-          </button>
-          <button 
-            className={`ql-don-hang-filter-tab ${filter === "dang_giao" ? "ql-don-hang-active" : ""}`}
-            onClick={() => setFilter("dang_giao")}
-          >
-            Đang giao ({getOrderCountByStatus("dang_giao")})
-          </button>
-          <button 
-            className={`ql-don-hang-filter-tab ${filter === "hoan_thanh" ? "ql-don-hang-active" : ""}`}
-            onClick={() => setFilter("hoan_thanh")}
-          >
-            Hoàn thành ({getOrderCountByStatus("hoan_thanh")})
-          </button>
-          <button 
-            className={`ql-don-hang-filter-tab ${filter === "da_huy" ? "ql-don-hang-active" : ""}`}
-            onClick={() => setFilter("da_huy")}
-          >
-            Đã hủy ({getOrderCountByStatus("da_huy")})
-          </button>
+          {[
+            { key: "all", label: "Tất cả" },
+            { key: "dang_xu_ly", label: "Đang xử lý" },
+            { key: "dang_lam", label: "Đang làm" },
+            { key: "dang_giao", label: "Đang giao" },
+            { key: "hoan_thanh", label: "Hoàn thành" },
+            { key: "da_huy", label: "Đã hủy" }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              className={`ql-don-hang-filter-tab ${filter === tab.key ? "ql-don-hang-active" : ""}`}
+              onClick={() => setFilter(tab.key)}
+            >
+              {tab.label} ({getOrderCountByStatus(tab.key)})
+            </button>
+          ))}
         </div>
       </div>
 
@@ -528,7 +469,9 @@ const handleViewInvoice = async (orderId) => {
           <div className="ql-don-hang-empty-state">
             <h3>📭 Không có đơn hàng nào</h3>
             <p>
-              {searchTerm ? "Không tìm thấy đơn hàng phù hợp với từ khóa tìm kiếm." : "Chưa có đơn hàng nào trong hệ thống."}
+              {searchTerm
+                ? "Không tìm thấy đơn hàng phù hợp với từ khóa tìm kiếm."
+                : "Chưa có đơn hàng nào trong hệ thống."}
             </p>
           </div>
         ) : (
@@ -540,7 +483,7 @@ const handleViewInvoice = async (orderId) => {
                     <strong>Đơn hàng #{order.id}</strong>
                     <span className="ql-don-hang-order-time">{getTimeElapsed(order.ngayTao)}</span>
                   </div>
-                  <div 
+                  <div
                     className="ql-don-hang-order-status"
                     style={{ backgroundColor: STATUS_COLORS[order.trangThai] }}
                   >
@@ -569,11 +512,21 @@ const handleViewInvoice = async (orderId) => {
                   </span>
                 </div>
 
+                {/* ===== HIỂN THỊ SHIPPER TRONG CARD ===== */}
+                {order.trangThai === "DANG_GIAO" && (
+                  <div className="ql-don-hang-order-shipper">
+                    <span className="ql-don-hang-shipper-icon">🚚</span>
+                    <span className="ql-don-hang-shipper-text">
+                      {order.nvGiaoHang
+                        ? `Shipper: ${order.nvGiaoHang.hoTen || order.nvGiaoHang.tenNguoiDung} — ${order.nvGiaoHang.soDienThoai || ""}`
+                        : "Chưa có shipper nhận"}
+                    </span>
+                  </div>
+                )}
+
                 <div className="ql-don-hang-order-date">
                   <span className="ql-don-hang-date-icon">📅</span>
-                  <span className="ql-don-hang-date-text">
-                    {formatDateTime(order.ngayTao)}
-                  </span>
+                  <span className="ql-don-hang-date-text">{formatDateTime(order.ngayTao)}</span>
                 </div>
 
                 {order.ghiChu && (
@@ -584,24 +537,21 @@ const handleViewInvoice = async (orderId) => {
                 )}
 
                 <div className="ql-don-hang-order-summary">
-                  <div className="ql-don-hang-items-count">
-                    💰 Thành tiền:
-                  </div>
+                  <div className="ql-don-hang-items-count">💰 Thành tiền:</div>
                   <div className="ql-don-hang-order-total">
                     {order.tongTien?.toLocaleString() || "0"}₫
                   </div>
                 </div>
 
                 <div className="ql-don-hang-order-actions">
-                  <button 
+                  <button
                     className="ql-don-hang-btn-view-details"
                     onClick={() => openOrderModal(order)}
                   >
                     Chi tiết
                   </button>
 
-            
-                  <button 
+                  <button
                     className="ql-don-hang-btn-invoice"
                     onClick={() => handleViewInvoice(order.id)}
                     disabled={loadingInvoice[order.id]}
@@ -609,9 +559,9 @@ const handleViewInvoice = async (orderId) => {
                   >
                     {loadingInvoice[order.id] ? "..." : "🧾 Hóa đơn"}
                   </button>
-                  
+
                   {order.trangThai === "DANG_XU_LY" && (
-                    <button 
+                    <button
                       className="ql-don-hang-btn-accept"
                       onClick={() => updateOrderStatus(order.id, "DANG_LAM")}
                       disabled={updating}
@@ -619,9 +569,9 @@ const handleViewInvoice = async (orderId) => {
                       Nhận đơn
                     </button>
                   )}
-                  
+
                   {order.trangThai === "DANG_LAM" && (
-                    <button 
+                    <button
                       className="ql-don-hang-btn-delivering"
                       onClick={() => updateOrderStatus(order.id, "DANG_GIAO")}
                       disabled={updating}
@@ -629,9 +579,9 @@ const handleViewInvoice = async (orderId) => {
                       Bắt đầu giao
                     </button>
                   )}
-                  
+
                   {order.trangThai === "DANG_GIAO" && (
-                    <button 
+                    <button
                       className="ql-don-hang-btn-complete"
                       onClick={() => updateOrderStatus(order.id, "HOAN_THANH")}
                       disabled={updating}
@@ -646,6 +596,7 @@ const handleViewInvoice = async (orderId) => {
         )}
       </div>
 
+      {/* ===== MODAL CHI TIẾT ===== */}
       {showModal && (
         <div className="ql-don-hang-modal-overlay" onClick={closeModal}>
           <div className="ql-don-hang-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -662,6 +613,7 @@ const handleViewInvoice = async (orderId) => {
                 </div>
               ) : selectedOrder ? (
                 <>
+                  {/* Thông tin khách hàng */}
                   <div className="ql-don-hang-detail-section">
                     <h3>Thông tin khách hàng</h3>
                     <div className="ql-don-hang-detail-grid">
@@ -680,6 +632,7 @@ const handleViewInvoice = async (orderId) => {
                     </div>
                   </div>
 
+                  {/* Thông tin đơn hàng */}
                   <div className="ql-don-hang-detail-section">
                     <h3>Thông tin đơn hàng</h3>
                     <div className="ql-don-hang-detail-grid">
@@ -704,9 +657,31 @@ const handleViewInvoice = async (orderId) => {
                         <span className="ql-don-hang-label">Ghi chú:</span>
                         <span>{selectedOrder.ghiChu || "Không có ghi chú"}</span>
                       </div>
+
+                      {/* ===== HIỂN THỊ SHIPPER TRONG MODAL ===== */}
+                      <div className="ql-don-hang-detail-item">
+                        <span className="ql-don-hang-label">🚚 Shipper:</span>
+                        {selectedOrder.nvGiaoHang ? (
+                          <span style={{ color: "#1565c0", fontWeight: 600 }}>
+                            {selectedOrder.nvGiaoHang.hoTen || selectedOrder.nvGiaoHang.tenNguoiDung}
+                          </span>
+                        ) : (
+                          <span style={{ color: "#999", fontStyle: "italic" }}>
+                            Chưa có shipper nhận
+                          </span>
+                        )}
+                      </div>
+
+                      {selectedOrder.nvGiaoHang && (
+                        <div className="ql-don-hang-detail-item">
+                          <span className="ql-don-hang-label">📞 SĐT Shipper:</span>
+                          <span>{selectedOrder.nvGiaoHang.soDienThoai || "N/A"}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
+                  {/* Chi tiết món ăn */}
                   <div className="ql-don-hang-detail-section">
                     <h3>Chi tiết món ăn</h3>
                     {selectedOrder.chiTietDonHang && selectedOrder.chiTietDonHang.length > 0 ? (
@@ -724,19 +699,16 @@ const handleViewInvoice = async (orderId) => {
                                 <div className="ql-don-hang-item-no-image">🍽️</div>
                               )}
                               <div className="ql-don-hang-item-details">
-                                <div className="ql-don-hang-item-name">{item.monAn?.tenMonAn || `Món ăn ID: ${item.monAnId}`}</div>
+                                <div className="ql-don-hang-item-name">
+                                  {item.monAn?.tenMonAn || `Món ăn ID: ${item.monAnId}`}
+                                </div>
                                 <div className="ql-don-hang-item-price">
                                   {(item.gia || item.donGia)?.toLocaleString() || "0"}₫ x {item.soLuong || 0}
                                 </div>
-                                {item.monAn?.khuyenMai && (
-                                  <div className="ql-don-hang-item-discount">
-                                    Khuyến mãi: -{item.monAn.khuyenMai.giaGiam?.toLocaleString()}₫
-                                  </div>
-                                )}
                               </div>
                             </div>
                             <div className="ql-don-hang-item-total">
-                              {item.thanhTien?.toLocaleString() || ((item.gia || item.donGia || 0) * (item.soLuong || 0))?.toLocaleString() || "0"}₫
+                              {(item.thanhTien || ((item.gia || item.donGia || 0) * (item.soLuong || 0)))?.toLocaleString() || "0"}₫
                             </div>
                           </div>
                         ))}
@@ -749,6 +721,7 @@ const handleViewInvoice = async (orderId) => {
                     )}
                   </div>
 
+                  {/* Tổng kết */}
                   <div className="ql-don-hang-detail-section">
                     <h3>Tổng kết thanh toán</h3>
                     <div className="ql-don-hang-summary-rows">
@@ -775,18 +748,18 @@ const handleViewInvoice = async (orderId) => {
                     </div>
                   </div>
 
+                  {/* Actions */}
                   <div className="ql-don-hang-modal-actions">
-                    <button 
+                    <button
                       className="ql-don-hang-btn-modal-invoice"
                       onClick={() => handleViewInvoice(selectedOrder.id)}
                       disabled={loadingInvoice[selectedOrder.id]}
-                      title="Xem và in hóa đơn"
                     >
                       {loadingInvoice[selectedOrder.id] ? "Đang tải..." : "🧾 Xem/In hóa đơn"}
                     </button>
 
                     {selectedOrder.trangThai === "DANG_XU_LY" && (
-                      <button 
+                      <button
                         className="ql-don-hang-btn-modal-accept"
                         onClick={() => updateOrderStatus(selectedOrder.id, "DANG_LAM")}
                         disabled={updating}
@@ -794,9 +767,9 @@ const handleViewInvoice = async (orderId) => {
                         {updating ? "Đang xử lý..." : "Nhận đơn hàng"}
                       </button>
                     )}
-                    
+
                     {selectedOrder.trangThai === "DANG_LAM" && (
-                      <button 
+                      <button
                         className="ql-don-hang-btn-modal-delivering"
                         onClick={() => updateOrderStatus(selectedOrder.id, "DANG_GIAO")}
                         disabled={updating}
@@ -804,9 +777,9 @@ const handleViewInvoice = async (orderId) => {
                         {updating ? "Đang xử lý..." : "Bắt đầu giao hàng"}
                       </button>
                     )}
-                    
+
                     {selectedOrder.trangThai === "DANG_GIAO" && (
-                      <button 
+                      <button
                         className="ql-don-hang-btn-modal-complete"
                         onClick={() => updateOrderStatus(selectedOrder.id, "HOAN_THANH")}
                         disabled={updating}

@@ -22,7 +22,7 @@ const ThanhToan = () => {
   const nguoiDungId = localStorage.getItem("idNguoiDung");
   const jwt = localStorage.getItem("jwt");
 
- 
+  // Phí ship constants
   const PHI_SHIP = 30000; 
   const MIEN_PHI_SHIP_TU = 200000; 
 
@@ -72,17 +72,13 @@ const ThanhToan = () => {
     }
   }, [nguoiDungId, jwt]);
 
-
   const tinhPhiShip = () => {
     const tongTienSauGiamGia = tongTienGoc - giamGia;
     return tongTienSauGiamGia >= MIEN_PHI_SHIP_TU ? 0 : PHI_SHIP;
   };
 
- 
   const phiShip = tinhPhiShip();
-
   const tongTienDonHang = tongTienGoc - giamGia;
- 
   const tongTienThanhToan = tongTienDonHang + phiShip;
 
   if (!state || !gioHang || gioHang.length === 0) {
@@ -181,7 +177,7 @@ const ThanhToan = () => {
     setError("");
   };
 
-  const taoDuLieuDonHang = (khoangCach) => {
+  const taoDuLieuDonHang = (khoangCach, latGiaoHang, lonGiaoHang) => {
     return {
       nguoiDungId: parseInt(nguoiDungId),
       diaChiGiaoHang: diaChi,
@@ -189,10 +185,12 @@ const ThanhToan = () => {
       tongTien: tongTienDonHang, 
       tongTienGoc: tongTienGoc,
       giamGia: giamGia,
-      
       voucherId: voucherData?.id || null,
       khoangCach: khoangCach,
       phuongThucThanhToan: phuongThucThanhToan,
+      // ✅ THÊM TỌA ĐỘ GIAO HÀNG
+      latGiaoHang: latGiaoHang,
+      lonGiaoHang: lonGiaoHang,
       chiTietDonHang: gioHang.map(item => ({
         monAnId: item.monAnId,
         soLuong: item.soLuong,
@@ -202,11 +200,11 @@ const ThanhToan = () => {
     };
   };
 
-  const handleVNPayPayment = async (khoangCach) => {
+  const handleVNPayPayment = async (khoangCach, latGiaoHang, lonGiaoHang) => {
     try {
       console.log("Đang chuẩn bị thanh toán VNPay...");
       
-      const donHangData = taoDuLieuDonHang(khoangCach);
+      const donHangData = taoDuLieuDonHang(khoangCach, latGiaoHang, lonGiaoHang);
       sessionStorage.setItem('pendingOrder', JSON.stringify(donHangData));
       sessionStorage.setItem('cartToDelete', nguoiDungId);
       
@@ -216,7 +214,7 @@ const ThanhToan = () => {
         params: {
           bookingId: tempOrderId.toString(),
           amount: tongTienThanhToan, 
-          bankCode: "" // Để trống để sử dụng cổng thanh toán VNPay mặc định
+          bankCode: ""
         }
       });
 
@@ -262,7 +260,11 @@ const ThanhToan = () => {
       }
 
       const khoangCach = distanceRes.data.khoangCach_km;
-      console.log(`Khoảng cách: ${khoangCach} km`);
+      // ✅ LẤY TỌA ĐỘ TỪ API
+      const latGiaoHang = distanceRes.data.lat;
+      const lonGiaoHang = distanceRes.data.lng;
+      
+      console.log(`Khoảng cách: ${khoangCach} km, Tọa độ: (${latGiaoHang}, ${lonGiaoHang})`);
 
       if (khoangCach > 20) {
         alert(
@@ -284,9 +286,7 @@ const ThanhToan = () => {
         `• Phương thức thanh toán: ${phuongThucText}\n` +
         `${ghiChu.trim() ? `• Ghi chú: ${ghiChu}\n` : ''}` +
         `${voucherData ? `• Voucher: ${voucherData.maVoucher} (-${giamGia.toLocaleString()}₫)\n` : ''}` +
-        
         `• Tổng tiền đơn hàng: ${tongTienDonHang.toLocaleString()}₫\n` +
-          
         `• Phí giao hàng: 30.000₫\n` +
         `• Tổng tiền thanh toán: ${tongTienThanhToan.toLocaleString()}₫\n\n` +
         `Bạn có muốn tiếp tục đặt hàng không?`
@@ -298,9 +298,10 @@ const ThanhToan = () => {
       }
 
       if (phuongThucThanhToan === "VNPAY") {
-        await handleVNPayPayment(khoangCach);
+        await handleVNPayPayment(khoangCach, latGiaoHang, lonGiaoHang);
       } else {
-        const donHangData = taoDuLieuDonHang(khoangCach);
+        // ✅ TRUYỀN TỌA ĐỘ VÀO ĐƠN HÀNG
+        const donHangData = taoDuLieuDonHang(khoangCach, latGiaoHang, lonGiaoHang);
 
         console.log("Dữ liệu đặt hàng COD:", donHangData);
         
@@ -323,7 +324,6 @@ const ThanhToan = () => {
             console.error("Lỗi khi tạo hóa đơn COD:", hoaDonError);
           }
           
-          // Thông báo thành công với thông tin phí ship
           let thongBaoThanhCong = "Đặt hàng thành công! Hóa đơn đã được tạo. Bạn sẽ thanh toán tiền mặt khi nhận hàng.";
           if (phiShip === 0) {
             thongBaoThanhCong += "\n\n🎉 Chúc mừng! Đơn hàng của bạn được MIỄN PHÍ GIAO HÀNG!";
@@ -350,9 +350,9 @@ const ThanhToan = () => {
         const errorMessage = err.response?.data?.error || "Không thể xác định vị trí địa chỉ";
         
         alert(
-          ` Lỗi xác định địa chỉ giao hàng\n\n` +
+          `⚠️ Lỗi xác định địa chỉ giao hàng\n\n` +
           `${errorMessage}\n\n` +
-          ` Rất tiếc, chúng tôi không thể xác định chính xác vị trí địa chỉ bạn nhập.\n\n` +
+          `😔 Rất tiếc, chúng tôi không thể xác định chính xác vị trí địa chỉ bạn nhập.\n\n` +
           `💡 Gợi ý:\n` +
           `• Vui lòng nhập địa chỉ chi tiết hơn (số nhà, tên đường, phường/xã)\n` +
           `• Hoặc thử nhập một địa chỉ gần đó (ví dụ: tên đường chính, chợ gần nhà)\n` +
@@ -552,7 +552,6 @@ const ThanhToan = () => {
         </div>
       </div>
 
-      {/* Thêm section thông tin phí ship */}
       <div className="section">
         <h3 className="section-title">🚚 Thông tin giao hàng & Phí ship</h3>
         <div className="delivery-info">

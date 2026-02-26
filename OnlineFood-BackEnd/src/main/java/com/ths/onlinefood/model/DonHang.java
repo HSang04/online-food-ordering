@@ -52,4 +52,9 @@ public class DonHang {
 
     @Column(name = "lon_giao_hang")
     private Double lonGiaoHang;
+    
+    @ManyToOne
+    @JoinColumn(name = "nv_giao_hang")
+    @JsonIgnoreProperties({"gioHangList"})
+    private NguoiDung nvGiaoHang;
 }

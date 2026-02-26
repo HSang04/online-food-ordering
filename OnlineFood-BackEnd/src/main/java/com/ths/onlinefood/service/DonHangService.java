@@ -20,7 +20,7 @@ import java.util.Map;
 public class DonHangService {
 
     private static final Logger logger = LoggerFactory.getLogger(DonHangService.class);
-    
+
     private final DonHangRepository donHangRepository;
     private final ChiTietDonHangRepository chiTietDonHangRepository;
     private final GioHangRepository gioHangRepository;
@@ -29,28 +29,26 @@ public class DonHangService {
     private final VoucherRepository voucherRepository;
     private final VoucherService voucherService;
     private HoaDonService hoaDonService;
-    
+
     @Transactional
     public DonHang createFromRequest(DonHangRequest request) {
         NguoiDung nguoiDung = nguoiDungRepository.findById(request.getNguoiDungId())
                 .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
 
-      
         if (request.getVoucherId() != null) {
             Voucher voucher = voucherRepository.findById(request.getVoucherId())
                 .orElseThrow(() -> new IllegalArgumentException("Voucher không tồn tại"));
-            
-        
+
             Map<String, Object> voucherValidation = voucherService.validateVoucherForOrder(
-                voucher.getMaVoucher(), 
+                voucher.getMaVoucher(),
                 request.getTongTienGoc() != null ? request.getTongTienGoc() : request.getTongTien()
             );
-            
+
             if (!(Boolean) voucherValidation.get("valid")) {
                 String errorMessage = (String) voucherValidation.get("message");
                 throw new IllegalArgumentException("Voucher không hợp lệ: " + errorMessage);
             }
-            
+
             logger.info("Voucher {} đã được validate thành công cho đơn hàng", voucher.getMaVoucher());
         }
 
@@ -64,16 +62,14 @@ public class DonHangService {
         donHang.setLatGiaoHang(request.getLatGiaoHang());
         donHang.setLonGiaoHang(request.getLonGiaoHang());
 
-        
         if (request.getVoucherId() != null) {
             Voucher voucher = voucherRepository.findById(request.getVoucherId())
                 .orElseThrow(() -> new IllegalArgumentException("Voucher không tồn tại"));
             donHang.setVoucher(voucher);
         }
-        
+
         DonHang savedDonHang = donHangRepository.save(donHang);
 
-      
         for (ChiTietDonHangRequest ctReq : request.getChiTietDonHang()) {
             ChiTietDonHang ct = new ChiTietDonHang();
             ct.setDonHang(savedDonHang);
@@ -84,27 +80,23 @@ public class DonHangService {
             ct.setMonAn(monAnOpt.get());
             ct.setSoLuong(ctReq.getSoLuong());
             ct.setDonGia(ctReq.getGia());
-            
             chiTietDonHangRepository.save(ct);
         }
 
-       
-        // xu ly Voucher +-
         if (request.getVoucherId() != null) {
             Voucher voucher = voucherRepository.findById(request.getVoucherId()).get();
             boolean voucherUsed = voucherService.useVoucher(voucher.getMaVoucher());
             if (!voucherUsed) {
-                logger.warn("Không thể sử dụng voucher {} cho đơn hàng {}", 
+                logger.warn("Không thể sử dụng voucher {} cho đơn hàng {}",
                     voucher.getMaVoucher(), savedDonHang.getId());
             }
         }
 
-      
         gioHangRepository.deleteAllByNguoiDung(nguoiDung);
 
-        logger.info("Đơn hàng {} được tạo thành công cho người dùng {}", 
+        logger.info("Đơn hàng {} được tạo thành công cho người dùng {}",
             savedDonHang.getId(), nguoiDung.getId());
-        
+
         return savedDonHang;
     }
 
@@ -127,7 +119,7 @@ public class DonHangService {
             return donHangRepository.save(dh);
         }).orElse(null);
     }
-    
+
     public DonHang updateTrangThai(Long id, String trangThai) {
         Optional<DonHang> optional = donHangRepository.findById(id);
         if (optional.isEmpty()) return null;
@@ -148,41 +140,67 @@ public class DonHangService {
         donHangRepository.deleteById(id);
         return true;
     }
-    
-    
-    public List<DonHang> getDonHangByNguoiDungId(Long nguoiDungId) {
-    NguoiDung nguoiDung = nguoiDungRepository.findById(nguoiDungId)
-            .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
-    
-    return donHangRepository.findByNguoiDungOrderByNgayTaoDesc(nguoiDung);
-}
 
-   
+    public List<DonHang> getDonHangByNguoiDungId(Long nguoiDungId) {
+        NguoiDung nguoiDung = nguoiDungRepository.findById(nguoiDungId)
+                .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
+        return donHangRepository.findByNguoiDungOrderByNgayTaoDesc(nguoiDung);
+    }
+
     @Transactional
     public DonHang huyDonHang(Long donHangId, Long nguoiDungId) {
-        // Tìm đơn hàng
         DonHang donHang = donHangRepository.findById(donHangId)
                 .orElseThrow(() -> new IllegalArgumentException("Đơn hàng không tồn tại"));
 
-        // Kiểm tra quyền sở hữu
         if (!donHang.getNguoiDung().getId().equals(nguoiDungId)) {
             throw new SecurityException("Bạn không có quyền hủy đơn hàng này");
         }
 
-        // Chỉ cho phép hủy khi đang xử lý
         if (!donHang.getTrangThai().equals(TrangThaiDonHang_ENUM.DANG_XU_LY)) {
             throw new IllegalArgumentException("Chỉ có thể hủy đơn hàng khi đang xử lý");
         }
 
-        // Cập nhật trạng thái
         donHang.setTrangThai(TrangThaiDonHang_ENUM.DA_HUY);
-
 
         DonHang savedDonHang = donHangRepository.save(donHang);
         logger.info("Đơn hàng {} đã được hủy bởi người dùng {}", donHangId, nguoiDungId);
 
         return savedDonHang;
     }
-    
-   
+
+    public List<DonHang> getDonChoShipperNhan() {
+        return donHangRepository.findByTrangThaiAndNvGiaoHangIsNull(
+                TrangThaiDonHang_ENUM.DANG_XU_LY
+        );
+    }
+
+    @Transactional
+    public DonHang shipperNhanDon(Long donHangId, Long shipperId) {
+        // Dùng pessimistic lock để tránh 2 shipper nhận cùng 1 đơn cùng lúc
+        DonHang dh = donHangRepository.findByIdWithLock(donHangId)
+                .orElseThrow(() -> new IllegalArgumentException("Đơn không tồn tại"));
+
+        if (dh.getNvGiaoHang() != null)
+            throw new IllegalStateException("Đơn đã có shipper nhận rồi");
+
+        if (dh.getTrangThai() != TrangThaiDonHang_ENUM.DANG_XU_LY)
+            throw new IllegalStateException("Đơn không ở trạng thái chờ nhận");
+
+        NguoiDung shipper = nguoiDungRepository.findById(shipperId)
+                .orElseThrow(() -> new IllegalArgumentException("Shipper không tồn tại"));
+
+        dh.setNvGiaoHang(shipper);
+        dh.setTrangThai(TrangThaiDonHang_ENUM.DANG_GIAO);
+
+        logger.info("Shipper {} đã nhận đơn hàng {}", shipperId, donHangId);
+
+        return donHangRepository.save(dh);
+    }
+
+    public List<DonHang> getDonDangGiaoByShipper(Long shipperId) {
+        return donHangRepository.findByNvGiaoHangIdAndTrangThai(
+                shipperId,
+                TrangThaiDonHang_ENUM.DANG_GIAO
+        );
+    }
 }

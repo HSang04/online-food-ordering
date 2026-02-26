@@ -59,7 +59,8 @@ const RequireOrderManagement = ({ children }) => {
   const allowedRoles = [
     'ADMIN', 
     'QUANLY', 
-    'NHANVIEN_QUANLYDONHANG'
+    'NHANVIEN_QUANLYDONHANG',
+    'NHANVIEN_GIAOHANG'  // ✅ Thêm role shipper
   ];
 
   if (!allowedRoles.includes(vaiTro)) {
@@ -86,10 +87,27 @@ const RequireFoodManagement = ({ children }) => {
   return children;
 };
 
+// ✅ Thêm component mới cho Shipper
+const RequireShipper = ({ children }) => {
+  const vaiTro = localStorage.getItem('vaiTro');
+  
+  const allowedRoles = [
+    'NHANVIEN_QUANLYDONHANG',
+    'NHANVIEN_GIAOHANG'
+  ];
+
+  if (!allowedRoles.includes(vaiTro)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+};
+
 export default RequireAuth;
 export { 
   RequireAdmin, 
   RequireManagement, 
   RequireOrderManagement, 
-  RequireFoodManagement 
+  RequireFoodManagement,
+  RequireShipper  
 };

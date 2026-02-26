@@ -55,17 +55,15 @@ const LichSuGiaoDich = () => {
   const fetchDonHangs = useCallback(async () => {
     try {
       setLoading(true);
-     
-      
+      setError("");
+
       if (!nguoiDungId) {
         setError("Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.");
         return;
       }
-      
+
       const response = await axios.get(`/don-hang/nguoi-dung/${nguoiDungId}`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
+        headers: { Authorization: `Bearer ${jwt}` },
       });
 
       if (response.data) {
@@ -80,18 +78,14 @@ const LichSuGiaoDich = () => {
     } finally {
       setLoading(false);
     }
- }, [jwt, nguoiDungId]);
+  }, [jwt, nguoiDungId]);
 
-  // Lấy chi tiết đơn hàng
   const fetchOrderDetails = async (orderId) => {
     try {
       setLoadingDetails(true);
-      console.log("Đang lấy chi tiết đơn hàng:", orderId);
 
       const response = await axios.get(`/chi-tiet-don-hang/don-hang/${orderId}`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
+        headers: { Authorization: `Bearer ${jwt}` },
       });
 
       if (response.data && Array.isArray(response.data)) {
@@ -117,7 +111,6 @@ const LichSuGiaoDich = () => {
           )
         };
 
-        console.log("Đơn hàng sau khi xử lý:", completeOrder);
         setSelectedOrder(completeOrder);
       } else {
         const orderFromList = donHangs.find(order => order.id === orderId);
@@ -147,7 +140,6 @@ const LichSuGiaoDich = () => {
     }
   }, [fetchDonHangs, jwt]);
 
- 
   const normalizeStatus = (status) => {
     const statusMap = {
       "Đang xử lý": "dang_xu_ly",
@@ -159,23 +151,20 @@ const LichSuGiaoDich = () => {
     return statusMap[status] || status.toLowerCase().replace(/\s+/g, '_');
   };
 
-  
   const filteredOrders = donHangs.filter(order => {
     const normalizedStatus = normalizeStatus(order.trangThai);
     const matchesFilter = filter === "all" || normalizedStatus === filter;
-    const matchesSearch = searchTerm === "" ||
+    const matchesSearch =
+      searchTerm === "" ||
       order.id.toString().includes(searchTerm) ||
       order.diaChiGiaoHang?.toLowerCase().includes(searchTerm.toLowerCase());
-
     return matchesFilter && matchesSearch;
   });
-
 
   const getOrderCountByStatus = (status) => {
     if (status === "all") return donHangs.length;
     return donHangs.filter(order => normalizeStatus(order.trangThai) === status).length;
   };
-
 
   const cancelOrder = async (orderId) => {
     const confirmCancel = window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này không?");
@@ -183,26 +172,29 @@ const LichSuGiaoDich = () => {
 
     try {
       setCancelling(true);
-      
-      
+
       if (!nguoiDungId) {
         alert("Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.");
         return;
       }
 
-      const response = await axios.patch(`/don-hang/huy/${orderId}?nguoiDungId=${nguoiDungId}`, {}, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          'Content-Type': 'application/json'
-        },
-      });
+      const response = await axios.patch(
+        `/don-hang/huy/${orderId}?nguoiDungId=${nguoiDungId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+            "Content-Type": "application/json"
+          },
+        }
+      );
 
       if (response.data) {
-        setDonHangs(prev => prev.map(order =>
-          order.id === orderId
-            ? { ...order, trangThai: "DA_HUY" }
-            : order
-        ));
+        setDonHangs(prev =>
+          prev.map(order =>
+            order.id === orderId ? { ...order, trangThai: "DA_HUY" } : order
+          )
+        );
 
         if (selectedOrder && selectedOrder.id === orderId) {
           setSelectedOrder(prev => ({ ...prev, trangThai: "DA_HUY" }));
@@ -228,15 +220,14 @@ const LichSuGiaoDich = () => {
 
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
-    return date.toLocaleString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
     });
   };
-
 
   const getTimeElapsed = (orderDate) => {
     const now = new Date();
@@ -251,29 +242,24 @@ const LichSuGiaoDich = () => {
     return `${diffMins} phút trước`;
   };
 
-
   const openOrderModal = async (order) => {
     setShowModal(true);
     await fetchOrderDetails(order.id);
   };
-
 
   const closeModal = () => {
     setShowModal(false);
     setSelectedOrder(null);
   };
 
- 
   const canCancelOrder = (status) => {
     return status === "DANG_XU_LY" || status === "Đang xử lý";
   };
 
-  // Kiểm tra xem đơn hàng có thể xem hóa đơn không
   const canViewInvoice = (status) => {
     return status === "HOAN_THANH" || status === "Hoàn thành";
   };
 
-  // Hàm xem hóa đơn
   const viewInvoice = (orderId) => {
     navigate(`/hoa-don/${orderId}`);
   };
@@ -293,7 +279,7 @@ const LichSuGiaoDich = () => {
     return (
       <div className="lichSuGiaoDich-container">
         <div className="lichSuGiaoDich-errorContainer">
-          <h2> Có lỗi xảy ra</h2>
+          <h2>Có lỗi xảy ra</h2>
           <p>{error}</p>
           <button onClick={fetchDonHangs} className="lichSuGiaoDich-btnRetry">
             Thử lại
@@ -313,21 +299,15 @@ const LichSuGiaoDich = () => {
             <span className="lichSuGiaoDich-statLabel">Tổng đơn</span>
           </div>
           <div className="lichSuGiaoDich-statCard lichSuGiaoDich-processing">
-            <span className="lichSuGiaoDich-statNumber">
-              {getOrderCountByStatus("dang_xu_ly")}
-            </span>
+            <span className="lichSuGiaoDich-statNumber">{getOrderCountByStatus("dang_xu_ly")}</span>
             <span className="lichSuGiaoDich-statLabel">Đang xử lý</span>
           </div>
           <div className="lichSuGiaoDich-statCard lichSuGiaoDich-preparing">
-            <span className="lichSuGiaoDich-statNumber">
-              {getOrderCountByStatus("dang_lam")}
-            </span>
+            <span className="lichSuGiaoDich-statNumber">{getOrderCountByStatus("dang_lam")}</span>
             <span className="lichSuGiaoDich-statLabel">Đang làm</span>
           </div>
           <div className="lichSuGiaoDich-statCard lichSuGiaoDich-completed">
-            <span className="lichSuGiaoDich-statNumber">
-              {getOrderCountByStatus("hoan_thanh")}
-            </span>
+            <span className="lichSuGiaoDich-statNumber">{getOrderCountByStatus("hoan_thanh")}</span>
             <span className="lichSuGiaoDich-statLabel">Hoàn thành</span>
           </div>
         </div>
@@ -346,42 +326,22 @@ const LichSuGiaoDich = () => {
         </div>
 
         <div className="lichSuGiaoDich-filterTabs">
-          <button
-            className={`lichSuGiaoDich-filterTab ${filter === "all" ? "lichSuGiaoDich-active" : ""}`}
-            onClick={() => setFilter("all")}
-          >
-            Tất cả ({getOrderCountByStatus("all")})
-          </button>
-          <button
-            className={`lichSuGiaoDich-filterTab ${filter === "dang_xu_ly" ? "lichSuGiaoDich-active" : ""}`}
-            onClick={() => setFilter("dang_xu_ly")}
-          >
-            Đang xử lý ({getOrderCountByStatus("dang_xu_ly")})
-          </button>
-          <button
-            className={`lichSuGiaoDich-filterTab ${filter === "dang_lam" ? "lichSuGiaoDich-active" : ""}`}
-            onClick={() => setFilter("dang_lam")}
-          >
-            Đang làm ({getOrderCountByStatus("dang_lam")})
-          </button>
-          <button
-            className={`lichSuGiaoDich-filterTab ${filter === "dang_giao" ? "lichSuGiaoDich-active" : ""}`}
-            onClick={() => setFilter("dang_giao")}
-          >
-            Đang giao ({getOrderCountByStatus("dang_giao")})
-          </button>
-          <button
-            className={`lichSuGiaoDich-filterTab ${filter === "hoan_thanh" ? "lichSuGiaoDich-active" : ""}`}
-            onClick={() => setFilter("hoan_thanh")}
-          >
-            Hoàn thành ({getOrderCountByStatus("hoan_thanh")})
-          </button>
-          <button
-            className={`lichSuGiaoDich-filterTab ${filter === "da_huy" ? "lichSuGiaoDich-active" : ""}`}
-            onClick={() => setFilter("da_huy")}
-          >
-            Đã hủy ({getOrderCountByStatus("da_huy")})
-          </button>
+          {[
+            { key: "all", label: "Tất cả" },
+            { key: "dang_xu_ly", label: "Đang xử lý" },
+            { key: "dang_lam", label: "Đang làm" },
+            { key: "dang_giao", label: "Đang giao" },
+            { key: "hoan_thanh", label: "Hoàn thành" },
+            { key: "da_huy", label: "Đã hủy" }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              className={`lichSuGiaoDich-filterTab ${filter === tab.key ? "lichSuGiaoDich-active" : ""}`}
+              onClick={() => setFilter(tab.key)}
+            >
+              {tab.label} ({getOrderCountByStatus(tab.key)})
+            </button>
+          ))}
         </div>
       </div>
 
@@ -390,7 +350,9 @@ const LichSuGiaoDich = () => {
           <div className="lichSuGiaoDich-emptyState">
             <h3>📭 Không có đơn hàng nào</h3>
             <p>
-              {searchTerm ? "Không tìm thấy đơn hàng phù hợp với từ khóa tìm kiếm." : "Bạn chưa có đơn hàng nào."}
+              {searchTerm
+                ? "Không tìm thấy đơn hàng phù hợp với từ khóa tìm kiếm."
+                : "Bạn chưa có đơn hàng nào."}
             </p>
           </div>
         ) : (
@@ -417,6 +379,18 @@ const LichSuGiaoDich = () => {
                   </span>
                 </div>
 
+                {/* ===== SHIPPER TRONG CARD ===== */}
+                {(order.trangThai === "DANG_GIAO" || order.trangThai === "HOAN_THANH") && (
+                  <div className="lichSuGiaoDich-orderAddress">
+                    <span className="lichSuGiaoDich-addressIcon">🚚</span>
+                    <span className="lichSuGiaoDich-addressText">
+                      {order.nvGiaoHang
+                        ? `Shipper: ${order.nvGiaoHang.hoTen || order.nvGiaoHang.tenNguoiDung}${order.nvGiaoHang.soDienThoai ? ` — ${order.nvGiaoHang.soDienThoai}` : ""}`
+                        : "Đang chờ shipper nhận"}
+                    </span>
+                  </div>
+                )}
+
                 <div className="lichSuGiaoDich-orderDate">
                   <span className="lichSuGiaoDich-dateIcon">📅</span>
                   <span className="lichSuGiaoDich-dateText">
@@ -432,9 +406,7 @@ const LichSuGiaoDich = () => {
                 )}
 
                 <div className="lichSuGiaoDich-orderSummary">
-                  <div className="lichSuGiaoDich-itemsCount">
-                    Thành tiền:
-                  </div>
+                  <div className="lichSuGiaoDich-itemsCount">Thành tiền:</div>
                   <div className="lichSuGiaoDich-orderTotal">
                     {order.tongTien?.toLocaleString() || "0"}₫
                   </div>
@@ -473,7 +445,7 @@ const LichSuGiaoDich = () => {
         )}
       </div>
 
-  
+      {/* ===== MODAL ===== */}
       {showModal && (
         <div className="lichSuGiaoDich-modalOverlay" onClick={closeModal}>
           <div className="lichSuGiaoDich-modalContent" onClick={(e) => e.stopPropagation()}>
@@ -490,6 +462,7 @@ const LichSuGiaoDich = () => {
                 </div>
               ) : selectedOrder ? (
                 <>
+                  {/* Thông tin đơn hàng */}
                   <div className="lichSuGiaoDich-detailSection">
                     <h3>Thông tin đơn hàng</h3>
                     <div className="lichSuGiaoDich-detailGrid">
@@ -516,11 +489,26 @@ const LichSuGiaoDich = () => {
                       </div>
                       <div className="lichSuGiaoDich-detailItem">
                         <span className="lichSuGiaoDich-label">Phương thức thanh toán:</span>
-                        <span>{selectedOrder.phuongThucThanhToan === "COD" ? "Tiền mặt khi nhận hàng" : "VNPay"}</span>
+                        <span>
+                          {selectedOrder.phuongThucThanhToan === "COD"
+                            ? "Tiền mặt khi nhận hàng"
+                            : "VNPay"}
+                        </span>
+                      </div>
+
+                      {/* ===== SHIPPER TRONG MODAL ===== */}
+                      <div className="lichSuGiaoDich-detailItem">
+                        <span className="lichSuGiaoDich-label">🚚 Shipper:</span>
+                        <span>
+                          {selectedOrder.nvGiaoHang
+                            ? `${selectedOrder.nvGiaoHang.hoTen || selectedOrder.nvGiaoHang.tenNguoiDung}${selectedOrder.nvGiaoHang.soDienThoai ? ` — ${selectedOrder.nvGiaoHang.soDienThoai}` : ""}`
+                            : "Chưa có shipper nhận"}
+                        </span>
                       </div>
                     </div>
                   </div>
 
+                  {/* Chi tiết món ăn */}
                   <div className="lichSuGiaoDich-detailSection">
                     <h3>Chi tiết món ăn</h3>
                     {selectedOrder.chiTietDonHang && selectedOrder.chiTietDonHang.length > 0 ? (
@@ -538,7 +526,9 @@ const LichSuGiaoDich = () => {
                                 <div className="lichSuGiaoDich-itemNoImage">🍽️</div>
                               )}
                               <div className="lichSuGiaoDich-itemDetails">
-                                <div className="lichSuGiaoDich-itemName">{item.monAn?.tenMonAn || `Món ăn ID: ${item.monAnId}`}</div>
+                                <div className="lichSuGiaoDich-itemName">
+                                  {item.monAn?.tenMonAn || `Món ăn ID: ${item.monAnId}`}
+                                </div>
                                 <div className="lichSuGiaoDich-itemPrice">
                                   {(item.gia || item.donGia)?.toLocaleString() || "0"}₫ x {item.soLuong || 0}
                                 </div>
@@ -550,7 +540,7 @@ const LichSuGiaoDich = () => {
                               </div>
                             </div>
                             <div className="lichSuGiaoDich-itemTotal">
-                              {item.thanhTien?.toLocaleString() || ((item.gia || item.donGia || 0) * (item.soLuong || 0))?.toLocaleString() || "0"}₫
+                              {(item.thanhTien || ((item.gia || item.donGia || 0) * (item.soLuong || 0)))?.toLocaleString() || "0"}₫
                             </div>
                           </div>
                         ))}
@@ -562,12 +552,15 @@ const LichSuGiaoDich = () => {
                     )}
                   </div>
 
+                  {/* Tổng kết */}
                   <div className="lichSuGiaoDich-detailSection">
                     <h3>Tổng kết thanh toán</h3>
                     <div className="lichSuGiaoDich-summaryRows">
                       <div className="lichSuGiaoDich-summaryRow">
                         <span>Tạm tính:</span>
-                        <span>{selectedOrder.tongTienGoc?.toLocaleString() || selectedOrder.tongTien?.toLocaleString() || "0"}₫</span>
+                        <span>
+                          {selectedOrder.tongTienGoc?.toLocaleString() || selectedOrder.tongTien?.toLocaleString() || "0"}₫
+                        </span>
                       </div>
                       {selectedOrder.giamGia > 0 && (
                         <div className="lichSuGiaoDich-summaryRow lichSuGiaoDich-discount">
@@ -588,6 +581,7 @@ const LichSuGiaoDich = () => {
                     </div>
                   </div>
 
+                  {/* Actions */}
                   <div className="lichSuGiaoDich-modalActions">
                     {canCancelOrder(selectedOrder.trangThai) && (
                       <button
@@ -598,7 +592,7 @@ const LichSuGiaoDich = () => {
                         {cancelling ? "Đang hủy..." : "Hủy đơn hàng"}
                       </button>
                     )}
-                    
+
                     {canViewInvoice(selectedOrder.trangThai) && (
                       <button
                         className="lichSuGiaoDich-btnModalViewInvoice"

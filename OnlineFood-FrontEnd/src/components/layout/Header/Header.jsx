@@ -23,10 +23,9 @@ const Header = () => {
   const updateDropdownPosition = () => {
     if (dropdownTriggerRef.current) {
       const rect = dropdownTriggerRef.current.getBoundingClientRect();
-      
       setDropdownPosition({
-        top: rect.bottom + 8, 
-        left: rect.left + (rect.width / 2), 
+        top: rect.bottom + 8,
+        left: rect.left + (rect.width / 2),
       });
     }
   };
@@ -44,28 +43,24 @@ const Header = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
-          dropdownTriggerRef.current && !dropdownTriggerRef.current.contains(event.target)) {
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+        dropdownTriggerRef.current && !dropdownTriggerRef.current.contains(event.target)
+      ) {
         setIsDropdownOpen(false);
       }
     };
-    
+
     const handleEscapeKey = (event) => {
-      if (event.key === 'Escape') {
-        setIsDropdownOpen(false);
-      }
+      if (event.key === 'Escape') setIsDropdownOpen(false);
     };
 
     const handleResize = () => {
-      if (isDropdownOpen) {
-        updateDropdownPosition();
-      }
+      if (isDropdownOpen) updateDropdownPosition();
     };
 
     const handleScroll = () => {
-      if (isDropdownOpen) {
-        updateDropdownPosition();
-      }
+      if (isDropdownOpen) updateDropdownPosition();
     };
 
     if (isDropdownOpen) {
@@ -73,7 +68,7 @@ const Header = () => {
       document.addEventListener('keydown', handleEscapeKey);
       window.addEventListener('resize', handleResize);
       window.addEventListener('scroll', handleScroll);
-      
+
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
         document.removeEventListener('keydown', handleEscapeKey);
@@ -86,9 +81,9 @@ const Header = () => {
   const renderDropdown = (items) => (
     <>
       <li className={`nav-item dropdown-container ${isDropdownOpen ? 'show' : ''}`}>
-        <span 
+        <span
           ref={dropdownTriggerRef}
-          className="nav-link nav-hover dropdown-toggle" 
+          className="nav-link nav-hover dropdown-toggle"
           onClick={toggleDropdown}
           role="button"
           tabIndex={0}
@@ -105,11 +100,10 @@ const Header = () => {
         </span>
       </li>
 
-
       {isDropdownOpen && (
-        <div 
+        <div
           ref={dropdownRef}
-          className={`dropdown-menu-custom show`} 
+          className="dropdown-menu-custom show"
           role="menu"
           style={{
             top: `${dropdownPosition.top}px`,
@@ -118,10 +112,10 @@ const Header = () => {
           }}
         >
           {items.map(([to, label], index) => (
-            <Link 
+            <Link
               key={index}
-              className="dropdown-item" 
-              to={to} 
+              className="dropdown-item"
+              to={to}
               onClick={closeDropdown}
               role="menuitem"
               tabIndex={0}
@@ -142,7 +136,7 @@ const Header = () => {
       ['/quan-ly-nguoi-dung', 'Quản lý người dùng'],
       ['/quan-ly-voucher', 'Quản lý voucher'],
       ['/quan-ly-giao-dich', 'Quản lý giao dịch'],
-       ['/quan-ly-thong-tin', 'Quản lý thông tin cửa hàng'],
+      ['/quan-ly-thong-tin', 'Quản lý thông tin cửa hàng'],
     ];
 
     const dropdownItemsMonAn = [
@@ -155,7 +149,6 @@ const Header = () => {
         <>
           <li className="nav-item"><Link className="nav-link nav-hover" to="/">Trang chủ</Link></li>
           <li className="nav-item"><Link className="nav-link nav-hover" to="/menu">Thực đơn</Link></li>
-          {/* <li className="nav-item"><Link className="nav-link nav-hover" to="/cart">Giỏ hàng</Link></li> */}
           <li className="nav-item"><Link className="nav-link nav-hover" to="/login">Đăng nhập</Link></li>
         </>
       );
@@ -167,7 +160,7 @@ const Header = () => {
           <>
             <li className="nav-item"><Link className="nav-link nav-hover" to="/menu">Thực đơn</Link></li>
             {renderDropdown(dropdownItemsAdmin)}
-            <li className="nav-item"><Link className="nav-link nav-hover" to="/thong-ke">Thống kê doanh thu</Link></li>
+            <li className="nav-item"><Link className="nav-link nav-hover" to="/thong-ke">Thống kê</Link></li>
             <li className="nav-item"><Link className="nav-link nav-hover" to="/chat">Tin nhắn</Link></li>
             <li className="nav-item"><Link className="nav-link nav-hover" to="/profile">Hồ sơ</Link></li>
             <li className="nav-item"><span className="nav-link nav-hover logout-btn" onClick={handleLogout}>Đăng xuất</span></li>
@@ -207,13 +200,35 @@ const Header = () => {
           </>
         );
 
+      // ===== SHIPPER: chỉ hiện những gì cần thiết =====
+      case 'NHANVIEN_GIAOHANG':
+        return (
+          <>
+            <li className="nav-item">
+              <Link className="nav-link nav-hover" to="/quan-ly/giao-hang">
+                🚚 Đơn hàng
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link nav-hover" to="/profile">
+                👤 Hồ sơ
+              </Link>
+            </li>
+            <li className="nav-item">
+              <span className="nav-link nav-hover logout-btn" onClick={handleLogout}>
+                Đăng xuất
+              </span>
+            </li>
+          </>
+        );
+
       default:
         return (
           <>
             <li className="nav-item"><Link className="nav-link nav-hover" to="/">Trang chủ</Link></li>
             <li className="nav-item"><Link className="nav-link nav-hover" to="/menu">Thực đơn</Link></li>
             <li className="nav-item"><Link className="nav-link nav-hover" to="/cart">Giỏ hàng</Link></li>
-            <li className="nav-item"><Link className="nav-link nav-hover" to="/lich-su-giao-dich">Lịch sử giao dịch</Link></li>
+            <li className="nav-item"><Link className="nav-link nav-hover" to="/lich-su-giao-dich">Lịch sử đơn hàng</Link></li>
             <li className="nav-item"><Link className="nav-link nav-hover" to="/chat">Liên hệ hỗ trợ</Link></li>
             <li className="nav-item"><Link className="nav-link nav-hover" to="/profile">Hồ sơ</Link></li>
             <li className="nav-item"><span className="nav-link nav-hover logout-btn" onClick={handleLogout}>Đăng xuất</span></li>
@@ -221,6 +236,33 @@ const Header = () => {
         );
     }
   };
+
+  // Shipper dùng bottom nav bar trên mobile thay vì navbar trên đầu
+  if (vaiTro === 'NHANVIEN_GIAOHANG') {
+    return (
+      <>
+        {/* Top bar nhỏ gọn cho shipper */}
+        <nav className="navbar custom-navbar px-3 shipper-topbar">
+          <Link className="navbar-brand" to="/quan-ly/giao-hang">🚚 OU FOOD Shipper</Link>
+          <span className="nav-link nav-hover logout-btn" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+            Đăng xuất
+          </span>
+        </nav>
+
+        {/* Bottom navigation bar cho mobile */}
+        <div className="shipper-bottom-nav">
+          <Link to="/quan-ly/giao-hang" className="shipper-bottom-nav-item">
+            <span className="shipper-nav-icon">📥</span>
+            <span className="shipper-nav-label">Đơn hàng</span>
+          </Link>
+          <Link to="/profile" className="shipper-bottom-nav-item">
+            <span className="shipper-nav-icon">👤</span>
+            <span className="shipper-nav-label">Hồ sơ</span>
+          </Link>
+        </div>
+      </>
+    );
+  }
 
   return (
     <nav className="navbar navbar-expand-lg custom-navbar px-4">

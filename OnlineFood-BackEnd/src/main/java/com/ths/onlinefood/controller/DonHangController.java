@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 @RestController
@@ -31,8 +32,7 @@ public class DonHangController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-  
-  @PostMapping("/dat-hang")
+    @PostMapping("/dat-hang")
     @Transactional
     public ResponseEntity<DonHang> create(@RequestBody DonHangRequest request) {
         try {
@@ -48,7 +48,7 @@ public class DonHangController {
         DonHang updated = donHangService.update(id, donHang);
         return updated == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(updated);
     }
-    
+
     @PatchMapping("/trang-thai/{id}")
     public ResponseEntity<DonHang> updateTrangThai(
             @PathVariable Long id,
@@ -62,7 +62,6 @@ public class DonHangController {
         }
     }
 
-
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -70,7 +69,7 @@ public class DonHangController {
                 ? ResponseEntity.ok().build()
                 : ResponseEntity.notFound().build();
     }
-    
+
     @GetMapping("/nguoi-dung/{nguoiDungId}")
     public ResponseEntity<List<DonHang>> getDonHangByNguoiDung(@PathVariable Long nguoiDungId) {
         try {
@@ -81,7 +80,6 @@ public class DonHangController {
         }
     }
 
-  
     @GetMapping("/nguoi-dung")
     public ResponseEntity<List<DonHang>> getDonHangByNguoiDungParam(@RequestParam Long nguoiDungId) {
         try {
@@ -108,5 +106,31 @@ public class DonHangController {
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+    }
+
+    @GetMapping("/cho-shipper")
+    public ResponseEntity<List<DonHang>> choShipper() {
+        return ResponseEntity.ok(donHangService.getDonChoShipperNhan());
+    }
+
+   @PatchMapping("/{id}/nhan")
+    public ResponseEntity<?> nhanDon(
+            @PathVariable Long id,
+            @RequestParam Long shipperId
+    ) {
+        try {
+            DonHang result = donHangService.shipperNhanDon(id, shipperId);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            // In rõ lý do lỗi để debug
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/shipper/{shipperId}")
+    public ResponseEntity<List<DonHang>> shipperDon(@PathVariable Long shipperId) {
+        return ResponseEntity.ok(donHangService.getDonDangGiaoByShipper(shipperId));
     }
 }

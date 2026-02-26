@@ -1,0 +1,436 @@
+/* GiaoHang.css */
+
+.giao-hang-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.giao-hang-page-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 30px;
+  border-radius: 15px;
+  color: white;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.giao-hang-page-title {
+  margin: 0 0 20px 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+/* Stats Row */
+.giao-hang-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.giao-hang-stat-card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.giao-hang-stat-card.giao-hang-urgent {
+  background: rgba(244, 67, 54, 0.3);
+  border-color: rgba(244, 67, 54, 0.5);
+}
+
+.giao-hang-stat-number {
+  display: block;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.giao-hang-stat-label {
+  display: block;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Filters Section */
+.giao-hang-filters-section {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  align-items: center;
+}
+
+.giao-hang-search-box {
+  position: relative;
+  flex: 1;
+}
+
+.giao-hang-search-input {
+  width: 100%;
+  padding: 12px 45px 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.giao-hang-search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.giao-hang-search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+}
+
+.giao-hang-btn-refresh {
+  padding: 12px 24px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.giao-hang-btn-refresh:hover:not(:disabled) {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.giao-hang-btn-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Orders Grid */
+.giao-hang-orders-section {
+  margin-top: 30px;
+}
+
+.giao-hang-orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.giao-hang-order-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid #e0e0e0;
+}
+
+.giao-hang-order-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-color: #667eea;
+}
+
+.giao-hang-order-card.urgent {
+  border-color: #f44336;
+  background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+}
+
+.giao-hang-urgent-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #f44336;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  animation: giao-hang-pulse 2s infinite;
+}
+
+@keyframes giao-hang-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+/* Order Header */
+.giao-hang-order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.giao-hang-order-id strong {
+  font-size: 18px;
+  color: #333;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.giao-hang-order-time {
+  font-size: 13px;
+  color: #999;
+}
+
+.giao-hang-order-status {
+  background: #9c27b0;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Customer Info */
+.giao-hang-order-customer {
+  margin-bottom: 12px;
+}
+
+.giao-hang-customer-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.giao-hang-customer-icon {
+  font-size: 20px;
+}
+
+.giao-hang-customer-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.giao-hang-customer-phone {
+  font-size: 13px;
+  color: #666;
+  margin-top: 3px;
+}
+
+/* Address */
+.giao-hang-order-address {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.giao-hang-address-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.giao-hang-address-text {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Date */
+.giao-hang-order-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.giao-hang-date-icon {
+  font-size: 16px;
+}
+
+.giao-hang-date-text {
+  font-size: 13px;
+  color: #666;
+}
+
+/* Note */
+.giao-hang-order-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #fff9e6;
+  border-radius: 8px;
+  border-left: 3px solid #ffc107;
+}
+
+.giao-hang-note-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.giao-hang-note-text {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Summary */
+.giao-hang-order-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  margin-top: 15px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.giao-hang-items-count {
+  font-size: 14px;
+  color: #666;
+  font-weight: 600;
+}
+
+.giao-hang-order-total {
+  font-size: 20px;
+  font-weight: 700;
+  color: #667eea;
+}
+
+/* Actions */
+.giao-hang-order-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.giao-hang-btn-view-map {
+  flex: 1;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.giao-hang-btn-view-map:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Empty State */
+.giao-hang-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.giao-hang-empty-state h3 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.giao-hang-empty-state p {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Loading */
+.giao-hang-loading-container,
+.giao-hang-error-container {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.giao-hang-loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #667eea;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.giao-hang-btn-retry {
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.giao-hang-btn-retry:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .giao-hang-container {
+    padding: 15px;
+  }
+
+  .giao-hang-page-title {
+    font-size: 24px;
+  }
+
+  .giao-hang-orders-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .giao-hang-filters-section {
+    flex-direction: column;
+  }
+
+  .giao-hang-btn-refresh {
+    width: 100%;
+  }
+
+  .giao-hang-stats-row {
+    grid-template-columns: 1fr;
+  }
+}
