@@ -234,4 +234,70 @@ public class ThongKeService {
         
         return result;
     }
+    
+    public Map<String, Object> getThongKeShipper(int nam, int thang) {
+        LocalDateTime tuNgay = LocalDate.of(nam, thang, 1).atStartOfDay();
+        LocalDateTime denNgay = tuNgay.toLocalDate()
+            .withDayOfMonth(tuNgay.toLocalDate().lengthOfMonth())
+            .atTime(23, 59, 59);
+
+        // Lấy tất cả đơn HOAN_THANH trong tháng
+        List<DonHang> donHoanThanh = donHangRepository
+            .findByThoiGianHoanThanhBetweenAndTrangThai(tuNgay, denNgay, TrangThaiDonHang_ENUM.HOAN_THANH);
+
+        // Thống kê theo từng shipper
+        Map<Long, Map<String, Object>> shipperMap = new LinkedHashMap<>();
+
+        for (DonHang dh : donHoanThanh) {
+            if (dh.getNvGiaoHang() == null) continue;
+
+            Long shipperId = dh.getNvGiaoHang().getId();
+            shipperMap.putIfAbsent(shipperId, new HashMap<>());
+            Map<String, Object> info = shipperMap.get(shipperId);
+
+            // Tên shipper
+            info.put("hoTen", dh.getNvGiaoHang().getHoTen());
+            info.put("soDienThoai", dh.getNvGiaoHang().getSoDienThoai());
+
+            // Đếm tổng đơn
+            int tongDon = (int) info.getOrDefault("tongDon", 0);
+            info.put("tongDon", tongDon + 1);
+
+            // Đếm đơn trễ: thời gian từ lúc tạo đến lúc hoàn thành > 60 phút
+            if (dh.getThoiGianHoanThanh() != null) {
+                long minutes = java.time.Duration.between(dh.getNgayTao(), dh.getThoiGianHoanThanh()).toMinutes();
+                int donTre = (int) info.getOrDefault("donTre", 0);
+                if (minutes > 60) {
+                    info.put("donTre", donTre + 1);
+                } else {
+                    info.put("donTre", donTre);
+                }
+            }
+        }
+
+        // Chuyển map sang list
+        List<Map<String, Object>> danhSachShipper = new ArrayList<>();
+        for (Map.Entry<Long, Map<String, Object>> entry : shipperMap.entrySet()) {
+            Map<String, Object> item = new HashMap<>(entry.getValue());
+            item.put("shipperId", entry.getKey());
+            int tongDon = (int) item.getOrDefault("tongDon", 0);
+            int donTre = (int) item.getOrDefault("donTre", 0);
+            item.put("donDungHan", tongDon - donTre);
+            item.put("tiLeTre", tongDon == 0 ? 0 : Math.round((double) donTre / tongDon * 100));
+            danhSachShipper.add(item);
+        }
+
+        // Sắp xếp theo số đơn nhiều nhất
+        danhSachShipper.sort((a, b) ->
+            ((Integer) b.get("tongDon")).compareTo((Integer) a.get("tongDon")));
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("danhSachShipper", danhSachShipper);
+        result.put("thang", thang);
+        result.put("nam", nam);
+        result.put("tongShipper", danhSachShipper.size());
+        result.put("tongDonHoanThanh", donHoanThanh.size());
+
+        return result;
+    }
 }

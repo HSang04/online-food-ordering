@@ -9,34 +9,30 @@ const GiaoHang = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  
   const [isAutoRefreshing, setIsAutoRefreshing] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState(null);
   const intervalRef = useRef(null);
 
   const jwt = localStorage.getItem("jwt");
 
-const fetchDonHangDangGiao = useCallback(async () => {
+  const fetchDonHangDangGiao = useCallback(async () => {
     try {
       setLoading(true);
-      setError(""); // ✅ thêm dòng này
+      setError("");
       const shipperId = localStorage.getItem("idNguoiDung");
-      
+
       const response = await axios.get(`/don-hang/shipper/${shipperId}`, {
         headers: { Authorization: `Bearer ${jwt}` }
       });
 
       if (response.data && Array.isArray(response.data)) {
-        const dangGiao = response.data.filter(
-          order => order.trangThai === "DANG_GIAO"
-        );
-        const sortedOrders = dangGiao.sort((a, b) =>
-          new Date(b.ngayTao) - new Date(a.ngayTao)
-        );
+        const dangGiao = response.data.filter(order => order.trangThai === "DANG_GIAO");
+        const sortedOrders = dangGiao.sort((a, b) => new Date(b.ngayTao) - new Date(a.ngayTao));
         setDonHangs(sortedOrders);
       }
     } catch (err) {
-      // ...
+      console.error("Lỗi khi lấy đơn đang giao:", err);
+      setError("Không thể tải danh sách đơn hàng. Vui lòng thử lại sau.");
     } finally {
       setLoading(false);
     }
@@ -44,25 +40,18 @@ const fetchDonHangDangGiao = useCallback(async () => {
 
   const silentRefresh = useCallback(async () => {
     try {
-      const shipperId = localStorage.getItem("idNguoiDung"); // ✅ fix
+      const shipperId = localStorage.getItem("idNguoiDung");
       const response = await axios.get(`/don-hang/shipper/${shipperId}`, {
         headers: { Authorization: `Bearer ${jwt}` },
       });
-        
+
       if (response.data) {
-        const dangGiao = response.data.filter(
-          order => order.trangThai === "DANG_GIAO"
-        );
-        
-        const sortedOrders = dangGiao.sort((a, b) => 
-          new Date(b.ngayTao) - new Date(a.ngayTao)
-        );
-        
+        const dangGiao = response.data.filter(order => order.trangThai === "DANG_GIAO");
+        const sortedOrders = dangGiao.sort((a, b) => new Date(b.ngayTao) - new Date(a.ngayTao));
         setDonHangs(prevOrders => {
           const hasChanges = JSON.stringify(prevOrders) !== JSON.stringify(sortedOrders);
           return hasChanges ? sortedOrders : prevOrders;
         });
-        
         setLastRefreshTime(new Date());
       }
     } catch (err) {
@@ -72,60 +61,60 @@ const fetchDonHangDangGiao = useCallback(async () => {
     }
   }, [jwt]);
 
-  // Auto refresh mỗi 30 giây
   useEffect(() => {
     if (jwt && donHangs.length > 0) {
-      intervalRef.current = setInterval(() => {
-        silentRefresh();
-      }, 30000);
-
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-      };
+      intervalRef.current = setInterval(() => silentRefresh(), 30000);
+      return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
     }
   }, [jwt, silentRefresh, donHangs.length]);
 
   useEffect(() => {
-    if (jwt) {
-      fetchDonHangDangGiao();
-    }
+    if (jwt) fetchDonHangDangGiao();
   }, [fetchDonHangDangGiao, jwt]);
+
+  // ===== HOÀN THÀNH ĐƠN =====
+  const handleHoanThanh = async (orderId, e) => {
+    e.stopPropagation();
+    if (!window.confirm(`Xác nhận giao thành công đơn hàng #${orderId}?`)) return;
+
+    const shipperId = Number(localStorage.getItem("idNguoiDung"));
+    try {
+      await axios.patch(`/don-hang/${orderId}/hoan-thanh`, {}, {
+        params: { shipperId },
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
+      alert(`✅ Đơn hàng #${orderId} đã giao thành công!`);
+      setDonHangs(prev => prev.filter(o => o.id !== orderId));
+    } catch (err) {
+      alert(`❌ ${err.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại!"}`);
+    }
+  };
 
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return date.toLocaleString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
     });
   };
 
   const getTimeElapsed = (orderDate) => {
-    const now = new Date();
-    const created = new Date(orderDate);
-    const diffMs = now - created;
+    const diffMs = new Date() - new Date(orderDate);
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
-
     if (diffDays > 0) return `${diffDays} ngày trước`;
     if (diffHours > 0) return `${diffHours} giờ trước`;
     return `${diffMins} phút trước`;
   };
 
-  const filteredOrders = donHangs.filter(order => {
-    const matchesSearch = searchTerm === "" || 
-      order.id.toString().includes(searchTerm) ||
-      order.nguoiDung?.hoTen?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.nguoiDung?.tenNguoiDung?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.diaChiGiaoHang?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    return matchesSearch;
-  });
+  const filteredOrders = donHangs.filter(order =>
+    searchTerm === "" ||
+    order.id.toString().includes(searchTerm) ||
+    order.nguoiDung?.hoTen?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.nguoiDung?.tenNguoiDung?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.diaChiGiaoHang?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleViewDetails = (order) => {
     navigate(`/giao-hang/${order.id}`, { state: { order } });
@@ -148,9 +137,7 @@ const fetchDonHangDangGiao = useCallback(async () => {
         <div className="giao-hang-error-container">
           <h2>⚠️ Có lỗi xảy ra</h2>
           <p>{error}</p>
-          <button onClick={fetchDonHangDangGiao} className="giao-hang-btn-retry">
-            Thử lại
-          </button>
+          <button onClick={fetchDonHangDangGiao} className="giao-hang-btn-retry">Thử lại</button>
         </div>
       </div>
     );
@@ -161,21 +148,17 @@ const fetchDonHangDangGiao = useCallback(async () => {
       <header className="giao-hang-page-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 className="giao-hang-page-title">🚚 Đơn hàng đang giao</h1>
-          
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {isAutoRefreshing && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <div style={{
-                  width: '8px',
-                  height: '8px',
-                  backgroundColor: '#4caf50',
-                  borderRadius: '50%',
+                  width: '8px', height: '8px',
+                  backgroundColor: '#4caf50', borderRadius: '50%',
                   animation: 'giao-hang-pulse 1.5s infinite'
                 }}></div>
                 <span style={{ fontSize: '12px', color: '#666' }}>Đang cập nhật...</span>
               </div>
             )}
-            
             {lastRefreshTime && (
               <span style={{ fontSize: '12px', color: '#999' }}>
                 Cập nhật: {lastRefreshTime.toLocaleTimeString('vi-VN')}
@@ -183,7 +166,7 @@ const fetchDonHangDangGiao = useCallback(async () => {
             )}
           </div>
         </div>
-        
+
         <div className="giao-hang-stats-row">
           <div className="giao-hang-stat-card">
             <span className="giao-hang-stat-number">{donHangs.length}</span>
@@ -191,10 +174,9 @@ const fetchDonHangDangGiao = useCallback(async () => {
           </div>
           <div className="giao-hang-stat-card giao-hang-urgent">
             <span className="giao-hang-stat-number">
-              {donHangs.filter(order => {
-                const diffMins = Math.floor((new Date() - new Date(order.ngayTao)) / 60000);
-                return diffMins > 30;
-              }).length}
+              {donHangs.filter(order =>
+                Math.floor((new Date() - new Date(order.ngayTao)) / 60000) > 30
+              ).length}
             </span>
             <span className="giao-hang-stat-label">Quá 30 phút</span>
           </div>
@@ -212,12 +194,7 @@ const fetchDonHangDangGiao = useCallback(async () => {
           />
           <span className="giao-hang-search-icon">🔍</span>
         </div>
-
-        <button 
-          onClick={fetchDonHangDangGiao}
-          className="giao-hang-btn-refresh"
-          disabled={loading}
-        >
+        <button onClick={fetchDonHangDangGiao} className="giao-hang-btn-refresh" disabled={loading}>
           🔄 Làm mới
         </button>
       </div>
@@ -226,36 +203,28 @@ const fetchDonHangDangGiao = useCallback(async () => {
         {filteredOrders.length === 0 ? (
           <div className="giao-hang-empty-state">
             <h3>📭 Không có đơn hàng nào đang giao</h3>
-            <p>
-              {searchTerm ? "Không tìm thấy đơn hàng phù hợp với từ khóa tìm kiếm." : "Hiện tại không có đơn hàng nào đang trong quá trình giao."}
-            </p>
+            <p>{searchTerm ? "Không tìm thấy đơn hàng phù hợp." : "Hiện tại không có đơn hàng nào đang trong quá trình giao."}</p>
           </div>
         ) : (
           <div className="giao-hang-orders-grid">
             {filteredOrders.map((order) => {
               const diffMins = Math.floor((new Date() - new Date(order.ngayTao)) / 60000);
               const isUrgent = diffMins > 30;
-              
+
               return (
-                <div 
-                  key={order.id} 
+                <div
+                  key={order.id}
                   className={`giao-hang-order-card ${isUrgent ? 'urgent' : ''}`}
                   onClick={() => handleViewDetails(order)}
                 >
-                  {isUrgent && (
-                    <div className="giao-hang-urgent-badge">
-                      ⚠️ Quá thời gian
-                    </div>
-                  )}
-                  
+                  {isUrgent && <div className="giao-hang-urgent-badge">⚠️ Quá thời gian</div>}
+
                   <div className="giao-hang-order-header">
                     <div className="giao-hang-order-id">
                       <strong>Đơn hàng #{order.id}</strong>
                       <span className="giao-hang-order-time">{getTimeElapsed(order.ngayTao)}</span>
                     </div>
-                    <div className="giao-hang-order-status">
-                      🚚 Đang giao
-                    </div>
+                    <div className="giao-hang-order-status">🚚 Đang giao</div>
                   </div>
 
                   <div className="giao-hang-order-customer">
@@ -281,9 +250,7 @@ const fetchDonHangDangGiao = useCallback(async () => {
 
                   <div className="giao-hang-order-date">
                     <span className="giao-hang-date-icon">📅</span>
-                    <span className="giao-hang-date-text">
-                      Đặt lúc: {formatDateTime(order.ngayTao)}
-                    </span>
+                    <span className="giao-hang-date-text">Đặt lúc: {formatDateTime(order.ngayTao)}</span>
                   </div>
 
                   {order.ghiChu && (
@@ -294,23 +261,25 @@ const fetchDonHangDangGiao = useCallback(async () => {
                   )}
 
                   <div className="giao-hang-order-summary">
-                    <div className="giao-hang-items-count">
-                      💰 Tổng tiền:
-                    </div>
+                    <div className="giao-hang-items-count">💰 Tổng tiền:</div>
                     <div className="giao-hang-order-total">
                       {order.tongTien?.toLocaleString() || "0"}₫
                     </div>
                   </div>
 
+                  {/* ===== 2 NÚT HÀNH ĐỘNG ===== */}
                   <div className="giao-hang-order-actions">
-                    <button 
+                    <button
                       className="giao-hang-btn-view-map"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewDetails(order);
-                      }}
+                      onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
                     >
-                      🗺️ Xem đường đi
+                      🗺️ Đường đi
+                    </button>
+                    <button
+                      className="giao-hang-btn-hoan-thanh"
+                      onClick={(e) => handleHoanThanh(order.id, e)}
+                    >
+                      ✅ Hoàn thành
                     </button>
                   </div>
                 </div>

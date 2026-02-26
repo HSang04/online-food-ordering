@@ -36,9 +36,16 @@ public interface DonHangRepository extends JpaRepository<DonHang, Long> {
 
     List<DonHang> findByTrangThaiAndNvGiaoHangIsNull(TrangThaiDonHang_ENUM trangThai);
     List<DonHang> findByNvGiaoHangIdAndTrangThai(Long shipperId, TrangThaiDonHang_ENUM trangThai);
+    
+        List<DonHang> findByThoiGianHoanThanhBetweenAndTrangThai(
+        LocalDateTime tuNgay, 
+        LocalDateTime denNgay, 
+        TrangThaiDonHang_ENUM trangThai
+    );
 
     // Pessimistic lock để tránh 2 shipper nhận cùng 1 đơn cùng lúc
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT d FROM DonHang d WHERE d.id = :id")
     Optional<DonHang> findByIdWithLock(@Param("id") Long id);
 }
+

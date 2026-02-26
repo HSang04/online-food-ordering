@@ -172,4 +172,22 @@ public class ThongKeController {
             return ResponseEntity.badRequest().build();
         }
     }
+    
+    @GetMapping("/shipper")
+    public ResponseEntity<Map<String, Object>> getThongKeShipper(
+            @RequestParam(defaultValue = "0") int thang,
+            @RequestParam(defaultValue = "0") int nam) {
+
+        try {
+            // Mặc định tháng/năm hiện tại nếu không truyền
+            LocalDate now = LocalDate.now();
+            int finalThang = thang == 0 ? now.getMonthValue() : thang;
+            int finalNam = nam == 0 ? now.getYear() : nam;
+
+            Map<String, Object> result = thongKeService.getThongKeShipper(finalNam, finalThang);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

@@ -612,3 +612,160 @@
     break-inside: avoid;
   }
 }
+/* ===== THÊM VÀO CUỐI FILE ThongKe.css ===== */
+
+/* Summary cards màu riêng cho shipper */
+.summary-card.shipper-blue {
+  background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+  box-shadow: 0 4px 20px rgba(26, 115, 232, 0.3);
+}
+
+.summary-card.shipper-green {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+}
+
+.summary-card.shipper-orange {
+  background: linear-gradient(135deg, #ff9800 0%, #e65100 100%);
+  box-shadow: 0 4px 20px rgba(255, 152, 0, 0.3);
+}
+
+/* Bảng shipper */
+.shipper-list {
+  margin-top: 10px;
+}
+
+.shipper-list h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.shipper-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+
+.shipper-table-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 100px 100px 80px 100px;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  align-items: center;
+}
+
+.shipper-table-row {
+  padding: 14px 20px;
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 100px 100px 80px 100px;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.shipper-table-row:last-child {
+  border-bottom: none;
+}
+
+.shipper-table-row:hover {
+  background: #f8f9ff;
+}
+
+/* Hàng có tỉ lệ trễ cao */
+.shipper-table-row.row-warning {
+  background: #fff8f0;
+  border-left: 3px solid #ff9800;
+}
+
+.shipper-table-row.row-warning:hover {
+  background: #fff3e0;
+}
+
+/* Tên shipper với avatar */
+.shipper-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.shipper-avatar {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.shipper-phone {
+  color: #666;
+  font-size: 0.88rem;
+}
+
+.shipper-total {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.shipper-ontime, .shipper-late {
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Badge tỉ lệ trễ */
+.shipper-rate {
+  text-align: center;
+}
+
+.rate-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.rate-good {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.rate-warn {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.rate-bad {
+  background: #fdecea;
+  color: #c62828;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .shipper-table-header,
+  .shipper-table-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .shipper-table-header div:nth-child(n+3),
+  .shipper-table-row > div:nth-child(n+3) {
+    text-align: left;
+  }
+}

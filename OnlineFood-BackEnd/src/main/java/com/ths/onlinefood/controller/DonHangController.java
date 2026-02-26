@@ -133,4 +133,20 @@ public class DonHangController {
     public ResponseEntity<List<DonHang>> shipperDon(@PathVariable Long shipperId) {
         return ResponseEntity.ok(donHangService.getDonDangGiaoByShipper(shipperId));
     }
+    
+    @PatchMapping("/{id}/hoan-thanh")
+    public ResponseEntity<?> hoanThanh(
+            @PathVariable Long id,
+            @RequestParam Long shipperId
+    ) {
+        try {
+            return ResponseEntity.ok(donHangService.hoanThanhDon(id, shipperId));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }

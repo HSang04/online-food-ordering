@@ -57,4 +57,7 @@ public class DonHang {
     @JoinColumn(name = "nv_giao_hang")
     @JsonIgnoreProperties({"gioHangList"})
     private NguoiDung nvGiaoHang;
+    
+    @Column(name = "thoi_gian_hoan_thanh")
+    private LocalDateTime thoiGianHoanThanh;
 }

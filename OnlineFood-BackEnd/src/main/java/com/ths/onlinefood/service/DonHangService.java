@@ -203,4 +203,22 @@ public class DonHangService {
                 TrangThaiDonHang_ENUM.DANG_GIAO
         );
     }
+    
+    @Transactional
+    public DonHang hoanThanhDon(Long donHangId, Long shipperId) {
+        DonHang dh = donHangRepository.findById(donHangId)
+                .orElseThrow(() -> new IllegalArgumentException("Đơn không tồn tại"));
+
+        if (!dh.getNvGiaoHang().getId().equals(shipperId))
+            throw new SecurityException("Bạn không phải shipper của đơn này");
+
+        if (dh.getTrangThai() != TrangThaiDonHang_ENUM.DANG_GIAO)
+            throw new IllegalStateException("Đơn không ở trạng thái đang giao");
+
+        dh.setTrangThai(TrangThaiDonHang_ENUM.HOAN_THANH);
+        dh.setThoiGianHoanThanh(LocalDateTime.now());
+
+        logger.info("Đơn hàng {} hoàn thành bởi shipper {}", donHangId, shipperId);
+        return donHangRepository.save(dh);
+    }
 }
