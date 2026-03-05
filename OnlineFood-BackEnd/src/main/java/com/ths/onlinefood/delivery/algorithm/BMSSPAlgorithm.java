@@ -4,122 +4,110 @@ import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 import org.springframework.stereotype.Component;
+
 import java.util.*;
 
 /**
- * BMSSP Algorithm - Paper-faithful implementation with proper visited tracking
+ * BMSSP Algorithm - Recursion-level bounded multi-source version
+ * Closer to theoretical BMSSP formulation.
  */
 @Component
 public class BMSSPAlgorithm {
-    
+
     public static class Result {
+        public final double boundaryPrime;
+        public final Set<Integer> reached;
         public final Map<Integer, Double> dist;
         public final Map<Integer, Integer> parent;
-        public final Set<Integer> reached;
-        
-        public Result(Map<Integer, Double> dist, Map<Integer, Integer> parent, Set<Integer> reached) {
+
+        public Result(double boundaryPrime,
+                      Set<Integer> reached,
+                      Map<Integer, Double> dist,
+                      Map<Integer, Integer> parent) {
+            this.boundaryPrime = boundaryPrime;
+            this.reached = reached;
             this.dist = dist;
             this.parent = parent;
-            this.reached = reached;
         }
     }
-    
+
+    private static class NodeDistance implements Comparable<NodeDistance> {
+        int node;
+        double distance;
+
+        NodeDistance(int node, double distance) {
+            this.node = node;
+            this.distance = distance;
+        }
+
+        @Override
+        public int compareTo(NodeDistance other) {
+            return Double.compare(this.distance, other.distance);
+        }
+    }
+
     /**
-     * Run BMSSP from multiple sources with distance bound
-     * FIXED: Added visited set to prevent infinite loops
+     * Run BMSSP with recursion level l and distance bound B
      */
-    public Result run(Graph graph, Set<Integer> sources, double boundMeters) {
+    public Result run(Graph graph,
+                      Set<Integer> sources,
+                      int recursionLevel,
+                      double boundary) {
+
+        if (recursionLevel < 0)
+            throw new IllegalArgumentException("Recursion level must be >= 0");
+
+        if (boundary < 0)
+            throw new IllegalArgumentException("Boundary must be >= 0");
+
+        EdgeExplorer explorer = graph.createEdgeExplorer();
+
         Map<Integer, Double> dist = new HashMap<>();
         Map<Integer, Integer> parent = new HashMap<>();
         Set<Integer> reached = new HashSet<>();
-        Set<Integer> visited = new HashSet<>();  // ← FIX: Track processed nodes
-        Queue<Integer> queue = new LinkedList<>();
-        
-        EdgeExplorer explorer = graph.createEdgeExplorer();
-        
-        // Initialize all sources
+
+        PriorityQueue<NodeDistance> pq = new PriorityQueue<>();
+
+        // Initialize multi-source
         for (int s : sources) {
             dist.put(s, 0.0);
             parent.put(s, -1);
-            queue.add(s);
+            pq.add(new NodeDistance(s, 0.0));
         }
-        
-        int processedCount = 0;
-        int maxProcessed = 1_000_000; // Safety limit
-        
-        while (!queue.isEmpty() && processedCount < maxProcessed) {
-            int u = queue.poll();
-            
-            // Skip if already visited
-            if (visited.contains(u)) {
+
+        int maxReach = 1 << recursionLevel; // 2^l
+
+        while (!pq.isEmpty() && reached.size() < maxReach) {
+
+            NodeDistance current = pq.poll();
+            int u = current.node;
+            double distU = current.distance;
+
+            // Skip outdated entries
+            if (distU > dist.getOrDefault(u, Double.MAX_VALUE))
                 continue;
-            }
-            visited.add(u);
-            processedCount++;
-            
-            double distU = dist.get(u);
-            
-            // Skip if beyond bound
-            if (distU > boundMeters) {
-                continue;
-            }
-            
+
+            if (distU > boundary)
+                break;
+
             reached.add(u);
-            
-            // Explore neighbors
+
             EdgeIterator it = explorer.setBaseNode(u);
             while (it.next()) {
+
                 int v = it.getAdjNode();
-                double edgeWeight = it.getDistance();
-                double newDist = distU + edgeWeight;
-                
-                if (newDist <= boundMeters) {
-                    // Only update if better path found
-                    if (!dist.containsKey(v) || newDist < dist.get(v)) {
-                        dist.put(v, newDist);
-                        parent.put(v, u);
-                        
-                        // Only add to queue if not visited yet
-                        if (!visited.contains(v)) {
-                            queue.add(v);
-                        }
-                    }
+                double newDist = distU + it.getDistance();
+
+                if (newDist <= boundary &&
+                        newDist < dist.getOrDefault(v, Double.MAX_VALUE)) {
+
+                    dist.put(v, newDist);
+                    parent.put(v, u);
+                    pq.add(new NodeDistance(v, newDist));
                 }
             }
-            
-            // Log progress every 10000 nodes
-            if (processedCount % 10000 == 0) {
-                System.out.println("BMSSP: Processed " + processedCount + " nodes, reached " + reached.size());
-            }
         }
-        
-        System.out.println("BMSSP completed: processed=" + processedCount + ", reached=" + reached.size());
-        
-        return new Result(dist, parent, reached);
-    }
-    
-    /**
-     * Reconstruct path from source to target
-     */
-    public List<Integer> reconstructPath(Map<Integer, Integer> parent, int source, int target) {
-        if (!parent.containsKey(target)) {
-            return new ArrayList<>();
-        }
-        
-        List<Integer> path = new ArrayList<>();
-        int current = target;
-        int maxSteps = 100000; // Safety limit
-        int steps = 0;
-        
-        while (current != -1 && steps < maxSteps) {
-            path.add(0, current);
-            if (current == source) {
-                break;
-            }
-            current = parent.getOrDefault(current, -1);
-            steps++;
-        }
-        
-        return path;
+
+        return new Result(boundary, reached, dist, parent);
     }
 }
