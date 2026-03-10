@@ -170,7 +170,7 @@ public class DonHangService {
     // Shipper nhận đơn
     // ─────────────────────────────────────────────────────────────
     public List<DonHang> getDonChoShipperNhan() {
-        return donHangRepository.findByTrangThaiAndNvGiaoHangIsNull(TrangThaiDonHang_ENUM.DANG_XU_LY);
+        return donHangRepository.findByTrangThaiAndNvGiaoHangIsNull(TrangThaiDonHang_ENUM.DANG_GIAO);
     }
 
     @Transactional
@@ -181,8 +181,8 @@ public class DonHangService {
         if (dh.getNvGiaoHang() != null)
             throw new IllegalStateException("Đơn đã có shipper nhận rồi");
 
-        if (dh.getTrangThai() != TrangThaiDonHang_ENUM.DANG_XU_LY)
-            throw new IllegalStateException("Đơn không ở trạng thái chờ nhận");
+       if (dh.getTrangThai() != TrangThaiDonHang_ENUM.DANG_GIAO)
+          throw new IllegalStateException("Đơn không ở trạng thái chờ nhận");
 
         NguoiDung shipper = nguoiDungRepository.findById(shipperId)
                 .orElseThrow(() -> new IllegalArgumentException("Shipper không tồn tại"));

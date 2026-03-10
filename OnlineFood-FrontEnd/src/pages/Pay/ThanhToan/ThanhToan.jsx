@@ -249,9 +249,26 @@ const ThanhToan = () => {
 
     try {
       console.log("Đang kiểm tra khoảng cách giao hàng...");
-      const distanceRes = await axios.get("/khoang-cach/dia-chi", {
-        params: { diaChi: diaChi },
-      });
+      let distanceRes;
+      try {
+        distanceRes = await axios.get("/khoang-cach/dia-chi", {
+          params: { diaChi: diaChi },
+          timeout: 15000, // fix thoi gian doi tim dia chi
+        });
+      } catch (timeoutErr) {
+        if (timeoutErr.code === "ECONNABORTED") {
+          alert(
+            "⚠️ Không thể xác định địa chỉ giao hàng\n\n" +
+            "Địa chỉ bạn nhập chưa đủ chi tiết hoặc hệ thống đang bận.\n\n" +
+            "💡 Vui lòng nhập địa chỉ cụ thể hơn, ví dụ:\n" +
+            "• \"40 Ngô Đức Kế, Phường Sài Gòn, Quận 1\"\n" +
+            "• \"Chợ Bến Thành, Quận 1, TP.HCM\""
+          );
+          setLoading(false);
+          return;
+        }
+        throw timeoutErr; // lỗi khác → để catch ngoài xử lý
+      }
 
       if (!distanceRes.data || distanceRes.data.khoangCach_km === undefined) {
         alert("Không thể xác định khoảng cách giao hàng. Vui lòng kiểm tra lại địa chỉ.");

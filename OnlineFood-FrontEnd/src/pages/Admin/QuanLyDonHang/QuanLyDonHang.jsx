@@ -241,28 +241,35 @@ const QuanLyDonHang = () => {
   };
 
   const handleViewInvoice = async (orderId) => {
+    const ALLOWED_ROLES = ["ADMIN", "QUANLY", "NHANVIEN_QUANLYDONHANG"];
+    if (!ALLOWED_ROLES.includes(vaiTro)) {
+      alert("Bạn không có quyền xem hóa đơn!");
+      return;
+    }
     try {
       setLoadingInvoice(prev => ({ ...prev, [orderId]: true }));
-      const vaiTroLocal = localStorage.getItem("vaiTro");
-      const headers = {
-        ...authHeader,
-        "User-Email": "admin@system.com",
-        "User-Role": vaiTroLocal,
-      };
-      await axios.get(`/hoa-don/don-hang/${orderId}`, { headers });
+
+      try {
+        // Thử lấy hóa đơn đã có
+        await axios.get(`/hoa-don/don-hang/${orderId}`, { headers: authHeader });
+      } catch (err) {
+        if (err.response?.status === 404) {
+          // Chưa có → tạo mới
+          await axios.post(`/hoa-don/tao-tu-don-hang/${orderId}`, {}, { headers: authHeader });
+        } else if (err.response?.status === 401) {
+          alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+          return;
+        } else if (err.response?.status === 403) {
+          alert("Bạn không có quyền xem hóa đơn này!");
+          return;
+        } else {
+          throw err;
+        }
+      }
+
       navigate(`/hoa-don/${orderId}`);
     } catch (err) {
-      const status = err.response?.status;
-      if (status === 404) {
-        try {
-          await axios.post(`/hoa-don/tao-tu-don-hang/${orderId}`, {}, { headers: authHeader });
-          navigate(`/hoa-don/${orderId}`);
-        } catch (createErr) {
-          alert(createErr.response?.data?.message || "Không thể tạo hóa đơn. Vui lòng thử lại!");
-        }
-      } else if (status === 401) alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
-      else if (status === 403) alert("Bạn không có quyền xem hóa đơn này!");
-      else alert("Không thể truy cập hóa đơn. Vui lòng thử lại!");
+      alert(err.response?.data?.message || "Không thể truy cập hóa đơn. Vui lòng thử lại!");
     } finally {
       setLoadingInvoice(prev => ({ ...prev, [orderId]: false }));
     }

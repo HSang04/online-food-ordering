@@ -39,18 +39,17 @@ public class HoaDonService {
      */
     public HoaDon getByDonHangIdWithEmailCheck(Long donHangId, String userEmail, boolean isAdminOrManager) {
         try {
-            // Tìm hóa đơn
+           System.out.println(">>> isAdminOrManager=" + isAdminOrManager + ", donHangId=" + donHangId);
+        
             Optional<HoaDon> optionalHoaDon = hoaDonRepository.findByDonHangIdWithDetails(donHangId);
-            
-            if (!optionalHoaDon.isPresent()) {
-                return null; // Không tìm thấy hóa đơn
-            }
-            
+            System.out.println(">>> Hóa đơn tìm thấy: " + optionalHoaDon.isPresent());
+
+            if (!optionalHoaDon.isPresent()) return null;
+
             HoaDon hoaDon = optionalHoaDon.get();
-            
-            // Nếu là Admin hoặc Quản lý thì cho phép xem tất cả
+
             if (isAdminOrManager) {
-                System.out.println("Admin/Quản lý truy cập hóa đơn: " + hoaDon.getId());
+                System.out.println(">>> Admin - cho phép!");
                 return hoaDon;
             }
             

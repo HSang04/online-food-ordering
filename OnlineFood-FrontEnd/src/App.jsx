@@ -61,7 +61,13 @@ const App = () => {
           <Route path="/cart" element={<RequireAuth allowedRoles={['KHACHHANG']}><GioHang /></RequireAuth>} />
           <Route path="/pay" element={<RequireAuth allowedRoles={['KHACHHANG']}><ThanhToan /></RequireAuth>} />
           <Route path="/lich-su-giao-dich" element={<RequireAuth allowedRoles={['KHACHHANG']}><LichSuGiaoDich /></RequireAuth>} />
-          <Route path="/hoa-don/:donHangId" element={<RequireAuth allowedRoles={['KHACHHANG']}><HoaDon /></RequireAuth>} />
+        <Route path="/hoa-don/:donHangId" 
+            element={
+              <RequireAuth allowedRoles={['KHACHHANG', 'ADMIN', 'QUANLY', 'NHANVIEN_QUANLYDONHANG']}>
+                <HoaDon />
+              </RequireAuth>
+            } 
+          />
           <Route path="/chat" element={<RequireAuth allowedRoles={['ADMIN', 'QUANLY', 'NHANVIEN_QUANLYDONHANG', 'NHANVIEN_QUANLYMONAN', 'KHACHHANG']}><TinNhan /></RequireAuth>} />
 
           {/* === FOOD MANAGEMENT === */}

@@ -577,3 +577,49 @@
     width: 100%;
   }
 }
+
+thu-tien-section { border-left: 4px solid #f59e0b; }
+
+.thu-tien-box {
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.thu-tien-box.cod {
+  background: #fff7ed;
+  border: 2px solid #f59e0b;
+}
+.thu-tien-box.vnpay {
+  background: #f0fdf4;
+  border: 2px solid #22c55e;
+}
+.thu-tien-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.thu-tien-amount {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #e53e3e;
+  margin-bottom: 4px;
+}
+.thu-tien-box.vnpay .thu-tien-amount { color: #16a34a; }
+.thu-tien-note {
+  font-size: 0.78rem;
+  color: #888;
+}
+
+
+.ghi-chu-section { border-left: 4px solid #a855f7; }
+
+.ghi-chu-box {
+  background: #faf5ff;
+  border: 1.5px solid #d8b4fe;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

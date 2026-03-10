@@ -22,43 +22,60 @@ import org.springframework.http.HttpMethod;
 @Configuration
 public class AppConfig {
 
-   @Bean
+    @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                    
-                  .requestMatchers("/api/delivery/**").permitAll()   
-                     .requestMatchers("/api/delivery/route/bmssp/**").permitAll()
-              
+
+                .requestMatchers("/api/delivery/**").permitAll()
+                .requestMatchers("/api/delivery/route/bounded-dijkstra/**").permitAll()
+
                 .requestMatchers("/auth/signup", "/auth/login").permitAll()
-                .requestMatchers("/auth/signup-by-admin").hasAnyAuthority("ADMIN", "QUANLY")
-                .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "QUANLY")
+                .requestMatchers("/auth/signup-by-admin")
+                    .hasAnyAuthority("ADMIN", "QUANLY")
+                .requestMatchers("/api/admin/**")
+                    .hasAnyAuthority("ADMIN", "QUANLY")
                 .requestMatchers("/api/nguoi-dung/secure/**").authenticated()
-                    
-                .requestMatchers(HttpMethod.POST, "/api/nguoi-dung").permitAll() 
-                .requestMatchers(HttpMethod.GET, "/api/nguoi-dung/**").authenticated()
-                    
-                .requestMatchers(HttpMethod.GET,"/api/danh-muc","/api/mon-an").permitAll()
-                .requestMatchers(HttpMethod.GET,"/api/danh-muc/**","/api/mon-an/**").permitAll()
+
+                .requestMatchers(HttpMethod.POST, "/api/nguoi-dung").permitAll()
+                .requestMatchers(HttpMethod.GET,  "/api/nguoi-dung/**").authenticated()
+
+                .requestMatchers(HttpMethod.GET, "/api/danh-muc", "/api/mon-an").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/danh-muc/**", "/api/mon-an/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/danh-gia-mon-an/mon-an/*/thong-ke").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/danh-gia-mon-an/mon-an/*/nguoi-dung/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/danh-gia-mon-an/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/danh-gia-mon-an/**").authenticated() 
-                .requestMatchers(HttpMethod.PUT, "/api/danh-gia-mon-an/**").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/api/danh-gia-mon-an/**").authenticated() 
-                
-                    
+                .requestMatchers(HttpMethod.POST,   "/api/danh-gia-mon-an/**").authenticated()
+                .requestMatchers(HttpMethod.PUT,    "/api/danh-gia-mon-an/**").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/danh-gia-mon-an/**").authenticated()
+
                 .requestMatchers(HttpMethod.GET, "/api/hinh-anh-mon-an/**").permitAll()
-                    
-                .requestMatchers("/api/nguoi-dung/**").hasAnyAuthority("ADMIN", "QUANLY")
-                .requestMatchers("/api/gio-hang/**").hasAnyAuthority("KHACHHANG")
-                .requestMatchers("/api/danh-gia-mon-an/**").authenticated() 
-                .requestMatchers("/api/tin-nhan/**").hasAnyAuthority("ADMIN", "QUANLY", "NHANVIEN_QUANLYDONHANG", "NHANVIEN_QUANLYMONAN", "KHACHHANG")
-                .requestMatchers(HttpMethod.GET, "/api/hoa-don/**").hasAnyAuthority("ADMIN", "QUANLY", "NHANVIEN_QUANLYDONHANG", "KHACHHANG")
-                .requestMatchers(HttpMethod.GET, "/api/thong-tin-cua-hang/**").permitAll()    
-//              .requestMatchers(HttpMethod.POST,"/api/hoa-don/**").hasAnyAuthority("KHACHHANG")
-                    
+
+                .requestMatchers("/api/nguoi-dung/**")
+                    .hasAnyAuthority("ADMIN", "QUANLY")
+                .requestMatchers("/api/gio-hang/**")
+                    .hasAnyAuthority("KHACHHANG")
+                .requestMatchers("/api/danh-gia-mon-an/**").authenticated()
+                .requestMatchers("/api/tin-nhan/**")
+                    .hasAnyAuthority("ADMIN", "QUANLY",
+                                     "NHANVIEN_QUANLYDONHANG",
+                                     "NHANVIEN_QUANLYMONAN",
+                                     "KHACHHANG")
+
+                // Hóa đơn — GET
+                .requestMatchers(HttpMethod.GET, "/api/hoa-don/**")
+                    .hasAnyAuthority("ADMIN", "QUANLY",
+                                     "NHANVIEN_QUANLYDONHANG",
+                                     "KHACHHANG")
+                // Hóa đơn — POST (tạo hóa đơn)
+                .requestMatchers(HttpMethod.POST, "/api/hoa-don/**")
+                    .hasAnyAuthority("ADMIN", "QUANLY",
+                                     "NHANVIEN_QUANLYDONHANG",
+                                     "KHACHHANG")
+
+                .requestMatchers(HttpMethod.GET, "/api/thong-tin-cua-hang/**").permitAll()
+
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             )

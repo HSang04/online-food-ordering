@@ -155,7 +155,7 @@ const TestMapBMSSP_SingleAddress = () => {
     try {
       // Gọi API BMSSP với tọa độ quán ăn và địa chỉ giao hàng
       const bmsspResponse = await fetch(
-        `${API_BASE_URL}/delivery/route/bmssp/shortest-path?` +
+        `${API_BASE_URL}/delivery/route/bounded-dijkstra/shortest-path?` +
         `latStart=${restaurantInfo.viDo}&lonStart=${restaurantInfo.kinhDo}&` +
         `latEnd=${destLat}&lonEnd=${destLon}&boundMeters=${bound}`
       );

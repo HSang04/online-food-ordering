@@ -29,8 +29,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class VNPayService {
 
-    private final String vnp_TmnCode = "67SD1HBD";
-    private final String vnp_HashSecret = "QKY03CZAPVVSMS8TB9LJWH7W5MOCFE5L";
+    private final String vnp_TmnCode = "O7A6EI0I";
+    private final String vnp_HashSecret = "V3IZD6YNCLA4IJD3HICR210R4Y4C7PX0";
     private final String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     private final String vnp_ReturnUrl = "http://localhost:3000/vnpay-result"; // URL return sau thanh toán
 

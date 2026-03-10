@@ -7,12 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-/**
- * BMSSP Algorithm - Recursion-level bounded multi-source version
- * Closer to theoretical BMSSP formulation.
- */
+
 @Component
-public class BMSSPAlgorithm {
+public class BoundedDijkstraAlgorithm {
 
     public static class Result {
         public final double boundaryPrime;
@@ -47,28 +44,24 @@ public class BMSSPAlgorithm {
     }
 
     /**
-     * Run BMSSP with recursion level l and distance bound B
+     * Chạy Bounded Multi-Source Dijkstra với recursion level l và distance bound B
      */
     public Result run(Graph graph,
                       Set<Integer> sources,
                       int recursionLevel,
                       double boundary) {
-
         if (recursionLevel < 0)
             throw new IllegalArgumentException("Recursion level must be >= 0");
-
         if (boundary < 0)
             throw new IllegalArgumentException("Boundary must be >= 0");
 
         EdgeExplorer explorer = graph.createEdgeExplorer();
-
         Map<Integer, Double> dist = new HashMap<>();
         Map<Integer, Integer> parent = new HashMap<>();
         Set<Integer> reached = new HashSet<>();
-
         PriorityQueue<NodeDistance> pq = new PriorityQueue<>();
 
-        // Initialize multi-source
+        // Khởi tạo multi-source
         for (int s : sources) {
             dist.put(s, 0.0);
             parent.put(s, -1);
@@ -78,12 +71,11 @@ public class BMSSPAlgorithm {
         int maxReach = 1 << recursionLevel; // 2^l
 
         while (!pq.isEmpty() && reached.size() < maxReach) {
-
             NodeDistance current = pq.poll();
             int u = current.node;
             double distU = current.distance;
 
-            // Skip outdated entries
+            // Bỏ qua entry cũ
             if (distU > dist.getOrDefault(u, Double.MAX_VALUE))
                 continue;
 
@@ -94,13 +86,10 @@ public class BMSSPAlgorithm {
 
             EdgeIterator it = explorer.setBaseNode(u);
             while (it.next()) {
-
                 int v = it.getAdjNode();
                 double newDist = distU + it.getDistance();
-
                 if (newDist <= boundary &&
                         newDist < dist.getOrDefault(v, Double.MAX_VALUE)) {
-
                     dist.put(v, newDist);
                     parent.put(v, u);
                     pq.add(new NodeDistance(v, newDist));

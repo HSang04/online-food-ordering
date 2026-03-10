@@ -2,7 +2,7 @@ package com.ths.onlinefood.delivery.controller;
 
 import com.ths.onlinefood.delivery.dto.RouteResponse;
 import com.ths.onlinefood.delivery.model.DeliveryRoute;
-import com.ths.onlinefood.delivery.service.BMSSPService;
+import com.ths.onlinefood.delivery.service.BoundedDijkstraService;
 import com.ths.onlinefood.model.ThongTinCuaHang;
 import com.ths.onlinefood.service.GeoLocationService;
 import com.ths.onlinefood.service.ThongTinCuaHangService;
@@ -11,17 +11,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/delivery/route/bmssp")
+@RequestMapping("/api/delivery/route/bounded-dijkstra")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-public class BMSSPRouteController {
+public class BoundedDijkstraRouteController {
 
-    private final BMSSPService bmsspService;
+    private final BoundedDijkstraService boundedDijkstraService;
     private final ThongTinCuaHangService cuaHangService;
-    private final GeoLocationService geoLocationService;
+    private final GeoLocationService     geoLocationService;
 
     @GetMapping("/shortest-path")
-    public ResponseEntity<RouteResponse> getShortestPathBMSSP(
+    public ResponseEntity<RouteResponse> getShortestPath(
             @RequestParam Double latStart,
             @RequestParam Double lonStart,
             @RequestParam Double latEnd,
@@ -30,7 +30,7 @@ public class BMSSPRouteController {
     ) {
         RouteResponse response = new RouteResponse();
         try {
-            DeliveryRoute route = bmsspService.findRoute(
+            DeliveryRoute route = boundedDijkstraService.findRoute(
                     latStart, lonStart, latEnd, lonEnd, boundMeters
             );
 
@@ -50,7 +50,7 @@ public class BMSSPRouteController {
         } catch (Exception e) {
             e.printStackTrace();
             response.setSuccess(false);
-            response.setMessage("BMSSP exception: " + e.getClass().getSimpleName());
+            response.setMessage("Bounded Dijkstra exception: " + e.getClass().getSimpleName());
             return ResponseEntity.ok(response);
         }
     }
@@ -62,7 +62,6 @@ public class BMSSPRouteController {
     ) {
         RouteResponse response = new RouteResponse();
         try {
-            // Lấy tọa độ cửa hàng
             ThongTinCuaHang cuaHang = cuaHangService.getCuaHang()
                     .orElseThrow(() -> new RuntimeException("Chưa có thông tin cửa hàng"));
 
@@ -70,11 +69,9 @@ public class BMSSPRouteController {
                 throw new RuntimeException("Cửa hàng chưa có tọa độ");
             }
 
-            // Chuyển địa chỉ giao hàng thành tọa độ
             double[] deliveryCoords = geoLocationService.getLatLngFromAddress(deliveryAddress);
 
-            // Tìm đường đi
-            DeliveryRoute route = bmsspService.findRoute(
+            DeliveryRoute route = boundedDijkstraService.findRoute(
                     cuaHang.getViDo(),
                     cuaHang.getKinhDo(),
                     deliveryCoords[0],

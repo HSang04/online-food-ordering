@@ -7,8 +7,17 @@ const DonChoNhan = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  // Track loading state per đơn để disable nút khi đang xử lý
+  const [nhanDonLoading, setNhanDonLoading] = useState({});
+  // Toast notification thay cho alert
+  const [toast, setToast] = useState(null);
 
   const jwt = localStorage.getItem("jwt");
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3500);
+  };
 
   const fetchDonChoNhan = useCallback(async () => {
     try {
@@ -18,7 +27,13 @@ const DonChoNhan = () => {
       });
 
       if (response.data && Array.isArray(response.data)) {
-        const sorted = response.data.sort(
+        // ✅ Lọc chỉ đơn có nv_giao_hang === null (chưa có shipper nào nhận)
+         console.log("📦 Data từ API:", JSON.stringify(response.data[0], null, 2));
+        const filtered = response.data.filter(
+          (order) => order.nvGiaoHang === null || order.nv_giao_hang === null
+        );
+
+        const sorted = filtered.sort(
           (a, b) => new Date(b.ngayTao) - new Date(a.ngayTao)
         );
         setDonChoNhan(sorted);
@@ -40,20 +55,18 @@ const DonChoNhan = () => {
     }
   }, [fetchDonChoNhan, jwt]);
 
- const handleNhanDon = async (orderId) => {
-    const confirmNhan = window.confirm(
-      `Xác nhận nhận đơn hàng #${orderId}?\n\nSau khi nhận, đơn này sẽ chuyển sang trạng thái "Đang giao" và chỉ bạn nhìn thấy.`
-    );
-    if (!confirmNhan) return;
+  const handleNhanDon = async (orderId) => {
+    // Tránh double-click: nếu đang xử lý thì bỏ qua
+    if (nhanDonLoading[orderId]) return;
 
-    // Đảm bảo shipperId là số, không phải string
     const shipperIdNum = Number(localStorage.getItem("idNguoiDung"));
     if (!shipperIdNum || isNaN(shipperIdNum)) {
-      alert("❌ Không tìm thấy thông tin shipper. Vui lòng đăng nhập lại!");
+      showToast("❌ Không tìm thấy thông tin shipper. Vui lòng đăng nhập lại!", "error");
       return;
     }
 
-    console.log("Đang nhận đơn:", { orderId, shipperId: shipperIdNum });
+    // Disable nút ngay lập tức
+    setNhanDonLoading((prev) => ({ ...prev, [orderId]: true }));
 
     try {
       const response = await axios.patch(
@@ -66,8 +79,9 @@ const DonChoNhan = () => {
       );
 
       if (response.data) {
-        alert(`✅ Nhận đơn #${orderId} thành công!`);
-        setDonChoNhan(prev => prev.filter(order => order.id !== orderId));
+        showToast(`✅ Nhận đơn #${orderId} thành công!`, "success");
+        // Xóa đơn khỏi danh sách ngay lập tức (không cần chờ refresh)
+        setDonChoNhan((prev) => prev.filter((order) => order.id !== orderId));
       }
     } catch (err) {
       const status = err.response?.status;
@@ -76,15 +90,18 @@ const DonChoNhan = () => {
       console.error("Lỗi nhận đơn:", { status, msg, response: err.response?.data });
 
       if (status === 409) {
-        alert(`⚠️ Đơn #${orderId} vừa được shipper khác nhận mất!\nDanh sách sẽ được cập nhật.`);
+        showToast(`⚠️ Đơn #${orderId} vừa được shipper khác nhận mất!`, "warning");
+        // Refresh danh sách để loại đơn đã bị lấy
         fetchDonChoNhan();
       } else {
-        alert(`❌ Lỗi: ${msg}`);
+        showToast(`❌ Lỗi: ${msg}`, "error");
+        // Re-enable nút nếu lỗi khác (để shipper thử lại)
+        setNhanDonLoading((prev) => ({ ...prev, [orderId]: false }));
       }
     }
   };
 
-  const filteredOrders = donChoNhan.filter(order => {
+  const filteredOrders = donChoNhan.filter((order) => {
     return (
       searchTerm === "" ||
       order.id.toString().includes(searchTerm) ||
@@ -127,6 +144,13 @@ const DonChoNhan = () => {
 
   return (
     <div className="don-cho-nhan-container">
+      {/* Toast notification */}
+      {toast && (
+        <div className={`toast toast-${toast.type}`}>
+          {toast.message}
+        </div>
+      )}
+
       <header className="don-cho-nhan-header">
         <h1>📥 Đơn hàng chờ nhận</h1>
         <p>Tổng: {donChoNhan.length} đơn đang chờ</p>
@@ -206,9 +230,10 @@ const DonChoNhan = () => {
               <div className="don-item-footer">
                 <button
                   onClick={() => handleNhanDon(order.id)}
-                  className="btn-nhan-don"
+                  className={`btn-nhan-don ${nhanDonLoading[order.id] ? "loading" : ""}`}
+                  disabled={!!nhanDonLoading[order.id]}
                 >
-                  ✅ Nhận đơn
+                  {nhanDonLoading[order.id] ? "⏳ Đang xử lý..." : "✅ Nhận đơn"}
                 </button>
               </div>
             </div>

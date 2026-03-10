@@ -3,6 +3,38 @@
   padding: 12px;
   max-width: 600px;
   margin: 0 auto;
+  position: relative;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  animation: slideDown 0.3s ease, fadeOut 0.4s ease 3.1s forwards;
+  white-space: nowrap;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.toast-success { background: #38a169; color: white; }
+.toast-error   { background: #e53e3e; color: white; }
+.toast-warning { background: #d69e2e; color: white; }
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 
 /* Header */
@@ -148,13 +180,22 @@
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: background 0.2s, transform 0.1s, opacity 0.2s;
   letter-spacing: 0.3px;
 }
 
 .btn-nhan-don:active {
   transform: scale(0.98);
   background: #e59400;
+}
+
+/* Trạng thái đang xử lý */
+.btn-nhan-don.loading,
+.btn-nhan-don:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
 }
 
 /* Empty state */

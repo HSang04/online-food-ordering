@@ -46,6 +46,8 @@ const formatDateTime = (dt) =>
   });
 
 const BOUND_METERS = 30000;
+const PHI_SHIP     = 30000;
+const MIEN_PHI_TU  = 200000;
 
 // ─── Component ───────────────────────────────────────────────
 const ChiTietGiaoHang = () => {
@@ -98,13 +100,10 @@ const ChiTietGiaoHang = () => {
       setLoadingOrder(true);
       const { data: order } = await axios.get(`/don-hang/${orderId}`, { headers: authHeader });
 
-      // ── OWNERSHIP CHECK ──
       if (!checkOwnership(order)) return;
-
       setDonHang(order);
     } catch (err) {
       console.error('Lỗi khi lấy chi tiết đơn hàng:', err);
-      // Backend trả 403 → không phải đơn của shipper này
       if (err.response?.status === 403) {
         alert('⚠️ Bạn không có quyền xem đơn hàng này!');
         navigate('/quan-ly/giao-hang', { replace: true });
@@ -125,7 +124,7 @@ const ChiTietGiaoHang = () => {
     setRouteError(null);
 
     try {
-      const { data } = await axios.get('/delivery/route/bmssp/shortest-path', {
+      const { data } = await axios.get('/delivery/route/bounded-dijkstra/shortest-path', {
         params: {
           latStart:    store.viDo,
           lonStart:    store.kinhDo,
@@ -187,11 +186,17 @@ const ChiTietGiaoHang = () => {
 
   // ── Complete delivery ──
   const handleCompleteDelivery = async () => {
+    const isCOD = donHang.hoaDon?.phuongThuc !== 'VNPAY';
+    const phiShip = (donHang.tongTien || 0) >= MIEN_PHI_TU ? 0 : PHI_SHIP;
+    const tongThuTien = isCOD ? (donHang.tongTien || 0) + phiShip : 0;
+
     if (!window.confirm(
       `Xác nhận hoàn thành giao hàng cho đơn #${donHang.id}?\n\n` +
       `Khách hàng: ${donHang.nguoiDung?.hoTen || donHang.nguoiDung?.tenNguoiDung}\n` +
-      `Tổng tiền: ${donHang.tongTien?.toLocaleString()}₫\n\n` +
-      `Sau khi xác nhận, đơn hàng sẽ chuyển sang trạng thái "Hoàn thành".`
+      (isCOD
+        ? `💰 Cần thu: ${tongThuTien.toLocaleString()}₫ (tiền mặt)\n`
+        : `✅ Đã thanh toán VNPay — không thu tiền\n`) +
+      `\nSau khi xác nhận, đơn hàng sẽ chuyển sang trạng thái "Hoàn thành".`
     )) return;
 
     setLoadingComplete(true);
@@ -202,7 +207,6 @@ const ChiTietGiaoHang = () => {
         { params: { shipperId }, headers: authHeader }
       );
 
-      // Cập nhật hóa đơn (non-critical)
       try {
         await axios.put(`/hoa-don/cap-nhat-hoan-thanh/${donHang.id}`, {}, { headers: authHeader });
       } catch {
@@ -230,7 +234,6 @@ const ChiTietGiaoHang = () => {
   useEffect(() => {
     const orderFromState = location.state?.order;
     if (orderFromState) {
-      // Đơn truyền qua state vẫn phải verify ownership
       if (!checkOwnership(orderFromState)) return;
       setDonHang(orderFromState);
       setLoadingOrder(false);
@@ -256,6 +259,11 @@ const ChiTietGiaoHang = () => {
       ? [storeInfo.viDo, storeInfo.kinhDo]
       : [10.7769, 106.7009];
 
+  // ── Tính tiền cần thu ──
+  const isCOD     = donHang?.hoaDon?.phuongThuc !== 'VNPAY';
+  const phiShip   = (donHang?.tongTien || 0) >= MIEN_PHI_TU ? 0 : PHI_SHIP;
+  const tongThuTien = isCOD ? (donHang?.tongTien || 0) + phiShip : 0;
+
   // ── Render guards ──
   if (loadingOrder) {
     return (
@@ -268,7 +276,7 @@ const ChiTietGiaoHang = () => {
     );
   }
 
-  if (!donHang) return null; // đã redirect trong checkOwnership
+  if (!donHang) return null;
 
   // ── Main render ──
   return (
@@ -288,6 +296,54 @@ const ChiTietGiaoHang = () => {
 
         {/* ── Info panel ── */}
         <div className="info-panel">
+
+          {/* ── THU TIỀN (đặt lên đầu, nổi bật nhất) ── */}
+          <div className={`info-section thu-tien-section ${isCOD ? 'cod' : 'vnpay'}`}>
+            <h3>💰 Thông tin thanh toán</h3>
+            {isCOD ? (
+              <div className="thu-tien-box cod">
+                <div className="thu-tien-badge">⚠️ CẦN THU TIỀN MẶT</div>
+                <div className="thu-tien-rows">
+                  <div className="thu-tien-row">
+                    <span>Tiền hàng:</span>
+                    <span>{donHang.tongTien?.toLocaleString()}₫</span>
+                  </div>
+                  <div className="thu-tien-row">
+                    <span>Phí ship:</span>
+                    <span>{phiShip === 0 ? 'Miễn phí' : `${phiShip.toLocaleString()}₫`}</span>
+                  </div>
+                  <div className="thu-tien-row total">
+                    <span>Tổng thu:</span>
+                    <span>{tongThuTien.toLocaleString()}₫</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="thu-tien-box vnpay">
+                <div className="thu-tien-badge paid">✅ ĐÃ THANH TOÁN VNPAY</div>
+                <div className="thu-tien-rows">
+                  <div className="thu-tien-row">
+                    <span>Số tiền:</span>
+                    <span>{donHang.tongTien?.toLocaleString()}₫</span>
+                  </div>
+                  <div className="thu-tien-row">
+                    <span>Trạng thái:</span>
+                    <span className="paid-text">Không cần thu tiền</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── GHI CHÚ NỔI BẬT (nếu có) ── */}
+          {donHang.ghiChu && (
+            <div className="info-section ghi-chu-section">
+              <h3>📝 Ghi chú từ khách hàng</h3>
+              <div className="ghi-chu-box">
+                {donHang.ghiChu}
+              </div>
+            </div>
+          )}
 
           {/* GPS */}
           <div className="info-section">
@@ -357,8 +413,7 @@ const ChiTietGiaoHang = () => {
             <h3>📦 Chi tiết đơn hàng</h3>
             <div className="info-grid">
               <InfoItem label="Thời gian đặt" value={formatDateTime(donHang.ngayTao)} />
-              <InfoItem label="Tổng tiền" valueClassName="highlight" value={`${donHang.tongTien?.toLocaleString()}₫`} />
-              {donHang.ghiChu && <InfoItem label="Ghi chú" value={donHang.ghiChu} fullWidth />}
+              <InfoItem label="Tổng tiền hàng" valueClassName="highlight" value={`${donHang.tongTien?.toLocaleString()}₫`} />
             </div>
           </div>
 
@@ -367,9 +422,9 @@ const ChiTietGiaoHang = () => {
             <div className="info-section route-info-section">
               <h3>🗺️ Thông tin đường đi</h3>
               <div className="route-stats">
-                <RouteStat icon="📏" value={`${routeInfo.distance?.toFixed(2)} km`}       label="Khoảng cách" />
-                <RouteStat icon="⏱️" value={`~${Math.ceil(routeInfo.duration)} phút`}     label="Thời gian" />
-                <RouteStat icon="📍" value={routeInfo.nodeCount}                           label="Điểm trên đường" />
+                <RouteStat icon="📏" value={`${routeInfo.distance?.toFixed(2)} km`}    label="Khoảng cách" />
+                <RouteStat icon="⏱️" value={`~${Math.ceil(routeInfo.duration)} phút`} label="Thời gian" />
+                <RouteStat icon="📍" value={routeInfo.nodeCount}                        label="Điểm trên đường" />
               </div>
               <p className="route-summary">{routeInfo.summary}</p>
             </div>
@@ -469,7 +524,7 @@ const ChiTietGiaoHang = () => {
             <div className="legend-item"><div className="legend-marker green" /><span>Cửa hàng</span></div>
             <div className="legend-item"><div className="legend-marker red"   /><span>Điểm giao hàng</span></div>
             <div className="legend-item"><div className="legend-marker blue"  /><span>Vị trí của bạn</span></div>
-            <div className="legend-item"><div className="legend-line"         /><span>Đường đi (BMSSP)</span></div>
+            <div className="legend-item"><div className="legend-line"         /><span>Đường đi (Dijkstra Bounded)</span></div>
           </div>
         </div>
       </div>
