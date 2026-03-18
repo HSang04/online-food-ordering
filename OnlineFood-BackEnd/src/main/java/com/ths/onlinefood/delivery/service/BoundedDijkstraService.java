@@ -43,8 +43,7 @@ public class BoundedDijkstraService {
         Set<Integer> sources = new HashSet<>();
         sources.add(sourceNode);
 
-        int recursionLevel = 16; // 2^16 ≈ 65,536 nodes
-
+        int recursionLevel = 18; // 2^18
         BoundedDijkstraAlgorithm.Result result =
                 boundedDijkstra.run(graph, sources, recursionLevel, boundMeters);
 

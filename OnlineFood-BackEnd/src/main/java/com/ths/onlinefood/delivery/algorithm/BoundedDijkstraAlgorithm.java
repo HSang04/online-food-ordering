@@ -43,9 +43,6 @@ public class BoundedDijkstraAlgorithm {
         }
     }
 
-    /**
-     * Chạy Bounded Multi-Source Dijkstra với recursion level l và distance bound B
-     */
     public Result run(Graph graph,
                       Set<Integer> sources,
                       int recursionLevel,
@@ -61,7 +58,7 @@ public class BoundedDijkstraAlgorithm {
         Set<Integer> reached = new HashSet<>();
         PriorityQueue<NodeDistance> pq = new PriorityQueue<>();
 
-        // Khởi tạo multi-source
+        //  khoi tao multi-source
         for (int s : sources) {
             dist.put(s, 0.0);
             parent.put(s, -1);
@@ -75,7 +72,6 @@ public class BoundedDijkstraAlgorithm {
             int u = current.node;
             double distU = current.distance;
 
-            // Bỏ qua entry cũ
             if (distU > dist.getOrDefault(u, Double.MAX_VALUE))
                 continue;
 

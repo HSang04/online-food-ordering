@@ -33,6 +33,7 @@ import TestMap from './pages/GiaoHang/TestMap/TestMap';
 import TestMapBMSSP from './pages/GiaoHang/TestMap/TestMapBBSSP';
 import ChiTietGiaoHang from './pages/Admin/GiaoHang/ChiTietGiaoHang';
 import ShipperDashboard from './pages/Admin/GiaoHang/ShipperDashboard';
+// import MapConfirmModal from './pages/Pay/ThanhToan/Mapconfirmmodal';
 
 const App = () => {
   return (
@@ -116,7 +117,7 @@ const App = () => {
           } 
         />
 
-          {/* === TEST ROUTES === */}
+    
           <Route path="/test-map" element={<TestMap />} />
           <Route path="/test-bmssp" element={<TestMapBMSSP />} />
         </Routes>

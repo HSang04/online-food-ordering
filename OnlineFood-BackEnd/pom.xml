@@ -18,6 +18,8 @@
     <properties>
         <java.version>17</java.version>
         <start-class>com.ths.onlinefood.OnlineFoodApplication</start-class>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
     
     <dependencies>
@@ -147,23 +149,33 @@
     </dependencies>
     
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>com.ths.onlinefood.OnlineFoodApplication</mainClass>
-                    <jvmArguments>
-                        -Xmx3g -Xms1g
-                    </jvmArguments>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <mainClass>com.ths.onlinefood.OnlineFoodApplication</mainClass>
+                <jvmArguments>
+                    -Xmx3g -Xms1g
+                </jvmArguments>
+                <excludes>
+                    <exclude>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                    </exclude>
+                </excludes>
+            </configuration>
+        </plugin>
+
+      
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+                <argLine>-Dfile.encoding=UTF-8</argLine>
+            </configuration>
+        </plugin>
+
+    </plugins>
+</build>
 </project>

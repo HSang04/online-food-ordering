@@ -7,8 +7,8 @@
 }
 
 .thanh-toan-container .address-label strong {
-  font-weight: normal;  
-  font-family: 'Segoe UI', sans-serif; 
+  font-weight: normal;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .thanh-toan-container .page-title {
@@ -28,15 +28,8 @@
   margin-top: 50px;
 }
 
-.thanh-toan-container .error-container h2 {
-  color: #e53e3e;
-  margin-bottom: 15px;
-}
-
-.thanh-toan-container .error-container p {
-  color: #718096;
-  margin-bottom: 20px;
-}
+.thanh-toan-container .error-container h2 { color: #e53e3e; margin-bottom: 15px; }
+.thanh-toan-container .error-container p  { color: #718096; margin-bottom: 20px; }
 
 .thanh-toan-container .btn-back-to-cart {
   background-color: #3182ce;
@@ -48,21 +41,17 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+.thanh-toan-container .btn-back-to-cart:hover { background-color: #2c5aa0; }
 
-.thanh-toan-container .btn-back-to-cart:hover {
-  background-color: #2c5aa0;
-}
-
-/* Section Styles */
+/* Section */
 .thanh-toan-container .section {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-
 .thanh-toan-container .section-title {
   color: #2d3748;
   font-size: 20px;
@@ -72,13 +61,12 @@
   border-bottom: 2px solid #e2e8f0;
 }
 
-/* Product List Styles */
+/* Product list */
 .thanh-toan-container .product-list {
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 16px;
 }
-
 .thanh-toan-container .product-item {
   display: flex;
   justify-content: space-between;
@@ -86,19 +74,13 @@
   padding: 16px 0;
   border-bottom: 1px solid #e9ecef;
 }
-
-.thanh-toan-container .product-item:last-child {
-  border-bottom: none;
-}
-
+.thanh-toan-container .product-item:last-child { border-bottom: none; }
 .thanh-toan-container .product-info {
   display: flex;
   align-items: center;
   gap: 12px;
   flex: 1;
 }
-
-/* ⚠️ QUAN TRỌNG: Chỉ áp dụng cho ThanhToan component */
 .thanh-toan-container .product-image {
   width: 60px;
   height: 60px;
@@ -106,23 +88,14 @@
   border-radius: 8px;
   border: 1px solid #e2e8f0;
 }
-
-.thanh-toan-container .product-details {
-  flex: 1;
-}
-
+.thanh-toan-container .product-details { flex: 1; }
 .thanh-toan-container .product-name {
   font-weight: 600;
   color: #2d3748;
   margin-bottom: 4px;
   font-size: 16px;
 }
-
-.thanh-toan-container .product-price-quantity {
-  color: #718096;
-  font-size: 14px;
-}
-
+.thanh-toan-container .product-price-quantity { color: #718096; font-size: 14px; }
 .thanh-toan-container .discount-badge {
   background-color: #e53e3e;
   color: white;
@@ -133,7 +106,6 @@
   margin-top: 4px;
   display: inline-block;
 }
-
 .thanh-toan-container .item-total {
   font-weight: 700;
   color: #e53e3e;
@@ -141,7 +113,6 @@
   min-width: 120px;
   text-align: right;
 }
-
 .thanh-toan-container .subtotal {
   display: flex;
   justify-content: space-between;
@@ -154,13 +125,12 @@
   color: #2d3748;
 }
 
-/* Address Section Styles */
+/* Address */
 .thanh-toan-container .address-section {
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 20px;
 }
-
 .thanh-toan-container .address-option {
   display: flex;
   align-items: flex-start;
@@ -170,29 +140,10 @@
   border-radius: 6px;
   transition: background-color 0.3s ease;
 }
-
-.thanh-toan-container .address-option:hover {
-  background-color: #e9ecef;
-}
-
-.thanh-toan-container .radio-input {
-  margin-right: 12px;
-  margin-top: 2px;
-  cursor: pointer;
-}
-
-.thanh-toan-container .address-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.thanh-toan-container .saved-address {
-  color: #718096;
-  font-weight: normal;
-  margin-left: 8px;
-}
-
+.thanh-toan-container .address-option:hover { background-color: #e9ecef; }
+.thanh-toan-container .radio-input { margin-right: 12px; margin-top: 2px; cursor: pointer; }
+.thanh-toan-container .address-label { display: flex; flex-direction: column; gap: 4px; }
+.thanh-toan-container .saved-address { color: #718096; font-weight: normal; margin-left: 8px; }
 .thanh-toan-container .address-input {
   width: 100%;
   padding: 12px;
@@ -201,341 +152,247 @@
   font-size: 14px;
   transition: border-color 0.3s ease;
   background-color: white;
+  box-sizing: border-box;
 }
-
 .thanh-toan-container .address-input:focus {
   outline: none;
   border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+  box-shadow: 0 0 0 3px rgba(49,130,206,0.1);
 }
-
 .thanh-toan-container .address-input.disabled {
   background-color: #f7fafc;
   color: #a0aec0;
   cursor: not-allowed;
 }
 
-/* Delivery Info Styles */
-.thanh-toan-container .delivery-info {
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.thanh-toan-container .delivery-note {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.thanh-toan-container .note-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* ── Nut kiem tra vi tri ─────────────────────────────────── */
+.thanh-toan-container .btn-check-location {
+  width: 100%;
+  margin-top: 12px;
   padding: 12px;
-  background-color: white;
-  border-left: 4px solid #3182ce;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.thanh-toan-container .note-icon {
-  font-size: 18px;
-  min-width: 24px;
-}
-
-.thanh-toan-container .note-item span:last-child {
-  color: #4a5568;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* Voucher Section Styles */
-.thanh-toan-container .voucher-section {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-}
-
-.thanh-toan-container .voucher-input-group {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.thanh-toan-container .voucher-input {
-  flex: 1;
-  padding: 12px;
-  border: 2px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  transition: border-color 0.3s ease;
-}
-
-.thanh-toan-container .voucher-input:focus {
-  outline: none;
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
-}
-
-.thanh-toan-container .voucher-input:disabled {
-  background-color: #f7fafc;
-  color: #a0aec0;
-  cursor: not-allowed;
-}
-
-.thanh-toan-container .btn-apply-voucher {
-  padding: 12px 24px;
-  background-color: #38a169;
+  background-color: #3182ce;
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  white-space: nowrap;
+  transition: background-color 0.2s, transform 0.1s;
 }
-
-.thanh-toan-container .btn-apply-voucher:hover:not(:disabled) {
-  background-color: #2f855a;
-}
-
-.thanh-toan-container .btn-apply-voucher:disabled {
+.thanh-toan-container .btn-check-location:hover:not(:disabled) { background-color: #2c5aa0; }
+.thanh-toan-container .btn-check-location:active:not(:disabled) { transform: scale(0.98); }
+.thanh-toan-container .btn-check-location:disabled {
   background-color: #a0aec0;
   cursor: not-allowed;
 }
 
-.thanh-toan-container .error-message {
-  color: #e53e3e;
-  font-size: 14px;
-  padding: 8px 12px;
-  background-color: #fed7d7;
-  border: 1px solid #feb2b2;
-  border-radius: 6px;
-  margin-top: 8px;
-}
-
-.thanh-toan-container .voucher-applied {
+/* ── Vi tri da xac nhan ──────────────────────────────────── */
+.thanh-toan-container .location-confirmed {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background-color: #c6f6d5;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background-color: #f0fff4;
+  border: 1px solid #9ae6b4;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #276749;
+}
+.thanh-toan-container .location-coords {
+  font-weight: 400;
+  font-size: 12px;
+  color: #48bb78;
+  font-family: monospace;
+}
+.thanh-toan-container .btn-recheck {
+  margin-left: auto;
+  padding: 4px 10px;
+  background: #c6f6d5;
   border: 1px solid #9ae6b4;
   border-radius: 6px;
-  padding: 12px;
-  margin-top: 12px;
-}
-
-.thanh-toan-container .voucher-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.thanh-toan-container .voucher-name {
-  font-weight: 600;
-  color: #22543d;
-}
-
-.thanh-toan-container .voucher-discount {
-  font-weight: 700;
-  color: #e53e3e;
-  font-size: 14px;
-}
-
-.thanh-toan-container .btn-remove-voucher {
-  background-color: #e53e3e;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 6px 12px;
   font-size: 12px;
+  color: #276749;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.2s;
+}
+.thanh-toan-container .btn-recheck:hover { background: #9ae6b4; }
+
+/* ── Canh bao chua xac nhan ──────────────────────────────── */
+.thanh-toan-container .location-warning {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background-color: #fffbeb;
+  border: 1px solid #f6e05e;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #744210;
 }
 
-.thanh-toan-container .btn-remove-voucher:hover {
-  background-color: #c53030;
+/* Address hint */
+.thanh-toan-container .address-hint { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.thanh-toan-container .hint-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #718096; }
+.thanh-toan-container .hint-icon { flex-shrink: 0; }
+
+/* Delivery info */
+.thanh-toan-container .delivery-info { background-color: #f8f9fa; border-radius: 12px; padding: 20px; }
+.thanh-toan-container .delivery-note { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.thanh-toan-container .note-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px; background-color: white;
+  border-left: 4px solid #3182ce; border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.thanh-toan-container .note-icon { font-size: 18px; min-width: 24px; }
+.thanh-toan-container .note-item span:last-child { color: #4a5568; font-size: 14px; line-height: 1.5; }
+
+/* Shipping fee */
+.thanh-toan-container .shipping-fee-info { margin-bottom: 16px; }
+.thanh-toan-container .free-shipping,
+.thanh-toan-container .paid-shipping {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px; background: white;
+  border-radius: 8px; border: 1px solid #e2e8f0;
+}
+.thanh-toan-container .shipping-icon { font-size: 24px; }
+.thanh-toan-container .shipping-status { font-weight: 700; color: #38a169; font-size: 16px; }
+.thanh-toan-container .shipping-condition,
+.thanh-toan-container .shipping-promotion { font-size: 13px; color: #718096; margin-top: 2px; }
+.thanh-toan-container .shipping-fee { font-weight: 600; color: #2d3748; }
+
+/* Payment method */
+.thanh-toan-container .payment-method-section { background: #f8f9fa; border-radius: 8px; padding: 16px; }
+.thanh-toan-container .payment-options { display: flex; flex-direction: column; gap: 12px; }
+.thanh-toan-container .payment-option {
+  display: flex; align-items: flex-start;
+  padding: 14px; background: white;
+  border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;
+  transition: border-color 0.2s;
+}
+.thanh-toan-container .payment-option:hover { border-color: #3182ce; }
+.thanh-toan-container .payment-method-info { flex: 1; }
+.thanh-toan-container .payment-method-name { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+.thanh-toan-container .payment-icon { font-size: 20px; }
+.thanh-toan-container .payment-method-desc { font-size: 13px; color: #718096; margin-top: 4px; }
+.thanh-toan-container .vnpay-options { margin-top: 12px; }
+.thanh-toan-container .vnpay-note { display: flex; flex-direction: column; gap: 8px; }
+
+/* Note textarea */
+.thanh-toan-container .note-section { background: #f8f9fa; border-radius: 8px; padding: 16px; }
+.thanh-toan-container .note-textarea {
+  width: 100%; padding: 12px;
+  border: 2px solid #e2e8f0; border-radius: 6px;
+  font-size: 14px; font-family: Arial, sans-serif;
+  resize: vertical; box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+.thanh-toan-container .note-textarea:focus {
+  outline: none; border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49,130,206,0.1);
 }
 
-/* Total Section Styles */
+/* Voucher */
+.thanh-toan-container .voucher-section { background-color: #f8f9fa; border-radius: 8px; padding: 20px; }
+.thanh-toan-container .voucher-input-group { display: flex; gap: 12px; margin-bottom: 16px; }
+.thanh-toan-container .voucher-input {
+  flex: 1; padding: 12px;
+  border: 2px solid #e2e8f0; border-radius: 6px;
+  font-size: 14px; font-weight: 600; text-transform: uppercase;
+  transition: border-color 0.3s;
+}
+.thanh-toan-container .voucher-input:focus {
+  outline: none; border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49,130,206,0.1);
+}
+.thanh-toan-container .voucher-input:disabled { background: #f7fafc; color: #a0aec0; cursor: not-allowed; }
+.thanh-toan-container .btn-apply-voucher {
+  padding: 12px 24px; background-color: #38a169; color: white;
+  border: none; border-radius: 6px; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background-color 0.3s; white-space: nowrap;
+}
+.thanh-toan-container .btn-apply-voucher:hover:not(:disabled) { background-color: #2f855a; }
+.thanh-toan-container .btn-apply-voucher:disabled { background-color: #a0aec0; cursor: not-allowed; }
+.thanh-toan-container .error-message {
+  color: #e53e3e; font-size: 14px; padding: 8px 12px;
+  background-color: #fed7d7; border: 1px solid #feb2b2;
+  border-radius: 6px; margin-top: 8px;
+}
+.thanh-toan-container .voucher-applied {
+  display: flex; justify-content: space-between; align-items: center;
+  background-color: #c6f6d5; border: 1px solid #9ae6b4;
+  border-radius: 6px; padding: 12px; margin-top: 12px;
+}
+.thanh-toan-container .voucher-info { display: flex; flex-direction: column; gap: 2px; }
+.thanh-toan-container .voucher-name { font-weight: 600; color: #22543d; }
+.thanh-toan-container .voucher-discount { font-weight: 700; color: #e53e3e; font-size: 14px; }
+.thanh-toan-container .btn-remove-voucher {
+  background-color: #e53e3e; color: white; border: none;
+  border-radius: 4px; padding: 6px 12px; font-size: 12px;
+  cursor: pointer; transition: background-color 0.3s;
+}
+.thanh-toan-container .btn-remove-voucher:hover { background-color: #c53030; }
+
+/* Total */
 .thanh-toan-container .total-section {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  background-color: #f8f9fa; border-radius: 8px;
+  padding: 20px; margin-bottom: 20px;
 }
-
 .thanh-toan-container .total-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  font-size: 16px;
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 8px 0; font-size: 16px;
 }
-
-.thanh-toan-container .total-row.discount {
-  color: #38a169;
-  font-weight: 600;
-}
-
+.thanh-toan-container .total-row.discount { color: #38a169; font-weight: 600; }
 .thanh-toan-container .total-row.final-total {
-  border-top: 2px solid #e2e8f0;
-  margin-top: 12px;
-  padding-top: 16px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #2d3748;
+  border-top: 2px solid #e2e8f0; margin-top: 12px;
+  padding-top: 16px; font-size: 20px; font-weight: 700; color: #2d3748;
+}
+.thanh-toan-container .final-total span:last-child { color: #e53e3e; }
+.thanh-toan-container .free-shipping-text { color: #38a169; font-weight: 600; }
+.thanh-toan-container .shipping-fee-text  { color: #e53e3e; font-weight: 600; }
+.thanh-toan-container .shipping-promotion-note {
+  margin-top: 10px; font-size: 13px; color: #718096;
+  padding: 8px 12px; background: #ebf8ff;
+  border-radius: 6px; border: 1px solid #bee3f8;
 }
 
-.thanh-toan-container .final-total span:last-child {
-  color: #e53e3e;
-}
-
-/* Action Buttons */
+/* Action buttons */
 .thanh-toan-container .action-buttons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
+  display: flex; gap: 16px; justify-content: center;
 }
-
 .thanh-toan-container .btn-back {
-  padding: 14px 28px;
-  background-color: #718096;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  padding: 14px 28px; background-color: #718096; color: white;
+  border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+  cursor: pointer; transition: background-color 0.3s;
 }
-
-.thanh-toan-container .btn-back:hover {
-  background-color: #4a5568;
-}
-
+.thanh-toan-container .btn-back:hover { background-color: #4a5568; }
 .thanh-toan-container .btn-order {
-  padding: 14px 28px;
-  background-color: #e53e3e;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  padding: 14px 28px; background-color: #e53e3e; color: white;
+  border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+  cursor: pointer; transition: background-color 0.3s;
 }
+.thanh-toan-container .btn-order:hover:not(:disabled) { background-color: #c53030; }
+.thanh-toan-container .btn-order:disabled { background-color: #a0aec0; cursor: not-allowed; }
 
-.thanh-toan-container .btn-order:hover:not(:disabled) {
-  background-color: #c53030;
-}
-
-.thanh-toan-container .btn-order:disabled {
-  background-color: #a0aec0;
-  cursor: not-allowed;
-}
-
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
-  .thanh-toan-container {
-    padding: 16px;
-  }
-  
-  .thanh-toan-container .section {
-    padding: 16px;
-  }
-  
-  .thanh-toan-container .product-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  
-  .thanh-toan-container .product-info {
-    width: 100%;
-  }
-  
-  .thanh-toan-container .item-total {
-    align-self: flex-end;
-    min-width: auto;
-  }
-  
-  .thanh-toan-container .voucher-input-group {
-    flex-direction: column;
-  }
-  
-  .thanh-toan-container .action-buttons {
-    flex-direction: column;
-  }
-  
+  .thanh-toan-container { padding: 16px; }
+  .thanh-toan-container .section { padding: 16px; }
+  .thanh-toan-container .product-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .thanh-toan-container .product-info { width: 100%; }
+  .thanh-toan-container .item-total { align-self: flex-end; min-width: auto; }
+  .thanh-toan-container .voucher-input-group { flex-direction: column; }
+  .thanh-toan-container .action-buttons { flex-direction: column; }
   .thanh-toan-container .btn-back,
-  .thanh-toan-container .btn-order {
-    width: 100%;
-  }
-  
-  .thanh-toan-container .address-option {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .thanh-toan-container .radio-input {
-    margin-bottom: 8px;
-  }
-  
-  /* Delivery info responsive */
-  .thanh-toan-container .delivery-info {
-    padding: 16px;
-  }
-  
-  .thanh-toan-container .note-item {
-    padding: 10px;
-  }
-  
-  .thanh-toan-container .note-item span:last-child {
-    font-size: 13px;
-  }
+  .thanh-toan-container .btn-order { width: 100%; }
 }
 
 @media (max-width: 480px) {
-  .thanh-toan-container .page-title {
-    font-size: 24px;
-  }
-  
-  .thanh-toan-container .section-title {
-    font-size: 18px;
-  }
-  
-  .thanh-toan-container .product-image {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .thanh-toan-container .product-name {
-    font-size: 14px;
-  }
-  
-  .thanh-toan-container .item-total {
-    font-size: 14px;
-  }
-  
-  .thanh-toan-container .subtotal {
-    font-size: 16px;
-  }
-  
-  .thanh-toan-container .note-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    text-align: left;
-  }
-  
-  .thanh-toan-container .note-icon {
-    align-self: flex-start;
-  }
-
-  
+  .thanh-toan-container .page-title { font-size: 24px; }
+  .thanh-toan-container .section-title { font-size: 18px; }
+  .thanh-toan-container .product-image { width: 50px; height: 50px; }
+  .thanh-toan-container .product-name { font-size: 14px; }
+  .thanh-toan-container .location-confirmed { flex-direction: column; align-items: flex-start; }
+  .thanh-toan-container .btn-recheck { margin-left: 0; }
 }

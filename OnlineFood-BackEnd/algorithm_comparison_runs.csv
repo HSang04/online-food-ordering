@@ -1,0 +1,101 @@
+Tuyen_duong,Run,Dijkstra_ms,BMSSP_ms
+Ben Thanh - Nha Tho Duc Ba,1,32.6816,285.2273
+Ben Thanh - Nha Tho Duc Ba,2,31.9559,290.0144
+Ben Thanh - Nha Tho Duc Ba,3,33.9027,180.5086
+Ben Thanh - Nha Tho Duc Ba,4,32.1083,238.8724
+Ben Thanh - Nha Tho Duc Ba,5,32.6919,308.0867
+Ben Thanh - Nha Tho Duc Ba,6,31.2688,282.6069
+Ben Thanh - Nha Tho Duc Ba,7,32.4782,214.6503
+Ben Thanh - Nha Tho Duc Ba,8,32.6057,257.6605
+Ben Thanh - Nha Tho Duc Ba,9,33.5356,280.4864
+Ben Thanh - Nha Tho Duc Ba,10,40.7208,317.0557
+Ben Thanh - Bui Vien,1,32.1461,675.9491
+Ben Thanh - Bui Vien,2,31.7406,605.3500
+Ben Thanh - Bui Vien,3,32.7566,374.2316
+Ben Thanh - Bui Vien,4,33.5678,469.2413
+Ben Thanh - Bui Vien,5,34.2819,538.8889
+Ben Thanh - Bui Vien,6,33.4290,549.5366
+Ben Thanh - Bui Vien,7,32.3719,534.7982
+Ben Thanh - Bui Vien,8,33.6753,531.5043
+Ben Thanh - Bui Vien,9,32.0395,692.5040
+Ben Thanh - Bui Vien,10,32.9400,754.3351
+Ho Con Rua - Dinh Doc Lap,1,66.6561,356.7587
+Ho Con Rua - Dinh Doc Lap,2,36.9561,380.6821
+Ho Con Rua - Dinh Doc Lap,3,33.5607,367.8547
+Ho Con Rua - Dinh Doc Lap,4,32.1083,393.2726
+Ho Con Rua - Dinh Doc Lap,5,33.4254,375.3137
+Ho Con Rua - Dinh Doc Lap,6,33.7126,340.3037
+Ho Con Rua - Dinh Doc Lap,7,32.3031,327.6898
+Ho Con Rua - Dinh Doc Lap,8,32.6061,362.3184
+Ho Con Rua - Dinh Doc Lap,9,33.0515,361.6999
+Ho Con Rua - Dinh Doc Lap,10,32.7764,308.4633
+Cho Lon - DH Y Duoc,1,41.0764,429.5762
+Cho Lon - DH Y Duoc,2,43.5545,335.3986
+Cho Lon - DH Y Duoc,3,34.8841,231.2797
+Cho Lon - DH Y Duoc,4,37.7809,268.9279
+Cho Lon - DH Y Duoc,5,81.5030,317.5725
+Cho Lon - DH Y Duoc,6,70.3782,380.7304
+Cho Lon - DH Y Duoc,7,56.0286,308.5229
+Cho Lon - DH Y Duoc,8,40.4581,243.7631
+Cho Lon - DH Y Duoc,9,45.4158,315.1300
+Cho Lon - DH Y Duoc,10,42.2964,358.5156
+Phu My Hung - SC VivoCity,1,42.0952,136.3589
+Phu My Hung - SC VivoCity,2,41.5279,112.4762
+Phu My Hung - SC VivoCity,3,40.9812,159.0208
+Phu My Hung - SC VivoCity,4,42.7750,163.2161
+Phu My Hung - SC VivoCity,5,39.6428,137.3039
+Phu My Hung - SC VivoCity,6,38.5218,150.5390
+Phu My Hung - SC VivoCity,7,43.7622,173.5439
+Phu My Hung - SC VivoCity,8,39.5468,144.8699
+Phu My Hung - SC VivoCity,9,51.4656,128.2819
+Phu My Hung - SC VivoCity,10,43.3587,96.1775
+Quan 1 - Quan 3,1,72.6533,584.4024
+Quan 1 - Quan 3,2,61.2491,643.6486
+Quan 1 - Quan 3,3,62.8448,444.8885
+Quan 1 - Quan 3,4,55.5568,552.5507
+Quan 1 - Quan 3,5,64.7801,572.5546
+Quan 1 - Quan 3,6,80.0345,607.2832
+Quan 1 - Quan 3,7,91.5401,492.6637
+Quan 1 - Quan 3,8,89.9544,769.5531
+Quan 1 - Quan 3,9,77.9773,673.3006
+Quan 1 - Quan 3,10,86.4562,436.3852
+DHQG TPHCM - Vincom Thu Duc,1,91.1999,280.1990
+DHQG TPHCM - Vincom Thu Duc,2,77.9667,265.7358
+DHQG TPHCM - Vincom Thu Duc,3,66.3352,252.5578
+DHQG TPHCM - Vincom Thu Duc,4,87.6561,189.3923
+DHQG TPHCM - Vincom Thu Duc,5,83.2325,254.6677
+DHQG TPHCM - Vincom Thu Duc,6,89.1619,261.6824
+DHQG TPHCM - Vincom Thu Duc,7,88.6848,271.8135
+DHQG TPHCM - Vincom Thu Duc,8,98.4781,202.2915
+DHQG TPHCM - Vincom Thu Duc,9,75.6179,263.8758
+DHQG TPHCM - Vincom Thu Duc,10,67.9416,212.1748
+Tan Binh - Quan 10,1,33.7100,484.1498
+Tan Binh - Quan 10,2,51.1878,691.1480
+Tan Binh - Quan 10,3,73.6699,627.6462
+Tan Binh - Quan 10,4,58.6514,546.8295
+Tan Binh - Quan 10,5,40.2641,514.1387
+Tan Binh - Quan 10,6,49.8021,551.3968
+Tan Binh - Quan 10,7,36.5125,620.9980
+Tan Binh - Quan 10,8,41.0215,570.1829
+Tan Binh - Quan 10,9,49.7649,542.2602
+Tan Binh - Quan 10,10,67.2288,559.3068
+Quan 9 - Quan 2,1,68.2714,752.3126
+Quan 9 - Quan 2,2,53.6344,651.4579
+Quan 9 - Quan 2,3,37.5866,437.5456
+Quan 9 - Quan 2,4,60.2407,611.9615
+Quan 9 - Quan 2,5,58.3504,705.8793
+Quan 9 - Quan 2,6,35.5932,736.9652
+Quan 9 - Quan 2,7,33.3289,610.6833
+Quan 9 - Quan 2,8,63.3492,469.3651
+Quan 9 - Quan 2,9,42.2843,577.3986
+Quan 9 - Quan 2,10,43.7408,561.5533
+Thu Duc - Binh Duong ranh gioi,1,81.4425,309.1536
+Thu Duc - Binh Duong ranh gioi,2,67.5733,232.2345
+Thu Duc - Binh Duong ranh gioi,3,64.4328,221.4612
+Thu Duc - Binh Duong ranh gioi,4,89.9655,205.6366
+Thu Duc - Binh Duong ranh gioi,5,39.2494,298.9399
+Thu Duc - Binh Duong ranh gioi,6,65.0934,267.5103
+Thu Duc - Binh Duong ranh gioi,7,57.3779,270.9092
+Thu Duc - Binh Duong ranh gioi,8,77.8916,246.3969
+Thu Duc - Binh Duong ranh gioi,9,85.8041,157.5561
+Thu Duc - Binh Duong ranh gioi,10,66.2819,238.0960
