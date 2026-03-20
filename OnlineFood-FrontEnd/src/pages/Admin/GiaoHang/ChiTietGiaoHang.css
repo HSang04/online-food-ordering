@@ -1,625 +1,411 @@
-/* ChiTietGiaoHang.css */
-
-.chi-tiet-giao-hang-container {
-  max-width: 1600px;
+/* ── Base — mobile first ─────────────────────────────────── */
+.ctgh-container {
+  max-width: 640px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 0 0 100px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f4f6fb;
+  min-height: 100vh;
 }
 
-/* Header */
-.chi-tiet-giao-hang-header {
+/* ── Header ──────────────────────────────────────────────── */
+.ctgh-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px 30px;
-  border-radius: 15px;
   color: white;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(102,126,234,0.35);
 }
 
-.header-top {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.btn-back {
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.2);
+.ctgh-btn-back {
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.2);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.btn-back:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-}
-
-.chi-tiet-giao-hang-header h1 {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-}
-
-/* Content Layout */
-.chi-tiet-giao-hang-content {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 30px;
-}
-
-/* Info Panel */
-.info-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.info-section {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.info-section h3 {
-  margin: 0 0 15px 0;
-  font-size: 18px;
-  color: #333;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-/* GPS Location Styles */
-.location-loading {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 15px;
-  background: #f0f4ff;
-  border-radius: 10px;
-  color: #667eea;
-  font-size: 14px;
-}
-
-.location-error {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  background: #fff3f3;
-  border: 2px solid #ffcdd2;
-  border-radius: 10px;
-  color: #c62828;
-  font-size: 14px;
-  gap: 10px;
-}
-
-.btn-retry-location {
-  padding: 8px 16px;
-  background: #f44336;
-  color: white;
-  border: none;
+  border: 1px solid rgba(255,255,255,0.35);
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
   white-space: nowrap;
+  transition: background 0.2s;
 }
+.ctgh-btn-back:hover { background: rgba(255,255,255,0.32); }
 
-.btn-retry-location:hover {
-  background: #d32f2f;
-}
-
-.location-info {
-  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-  padding: 15px;
-  border-radius: 10px;
-  border-left: 4px solid #2196f3;
-}
-
-.location-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.location-item:last-of-type {
-  border-bottom: none;
-  margin-bottom: 10px;
-}
-
-.location-label {
-  font-weight: 600;
-  color: #555;
-  font-size: 13px;
-}
-
-.location-value {
-  color: #2196f3;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'Courier New', monospace;
-}
-
-.btn-refresh-location {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  background: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-refresh-location:hover {
-  background: #1976d2;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
-}
-
-/* Info Grid */
-.info-grid {
-  display: grid;
-  gap: 12px;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 10px 0;
-}
-
-.info-item.full-width {
-  flex-direction: column;
-  gap: 5px;
-}
-
-.info-label {
-  font-weight: 600;
-  color: #666;
-  font-size: 14px;
-  min-width: 100px;
-}
-
-.info-value {
-  color: #333;
-  font-size: 14px;
-  text-align: right;
-  flex: 1;
-}
-
-.info-value.highlight {
-  color: #667eea;
-  font-weight: 700;
-  font-size: 18px;
-}
-
-/* Address Box */
-.address-box {
-  background: #f9f9f9;
-  padding: 15px;
-  border-radius: 10px;
-  border-left: 4px solid #667eea;
-}
-
-.address-text {
-  margin: 0 0 10px 0;
-  font-size: 15px;
-  color: #333;
-  line-height: 1.6;
-}
-
-.coordinates {
-  margin: 0;
-  font-size: 12px;
-  color: #999;
-  font-family: 'Courier New', monospace;
-}
-
-/* Route Info Section */
-.route-info-section {
-  background: linear-gradient(135deg, #f0f4ff 0%, #fef3ff 100%);
-  border: 2px solid #e0e7ff;
-}
-
-.route-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-bottom: 15px;
-}
-
-.route-stat {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: white;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.route-stat-icon {
-  font-size: 24px;
-}
-
-.route-stat-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: #667eea;
-  line-height: 1.2;
-}
-
-.route-stat-label {
-  font-size: 12px;
-  color: #666;
-}
-
-.route-summary {
-  margin: 0;
-  padding: 15px;
-  background: white;
-  border-radius: 10px;
-  font-size: 14px;
-  color: #555;
-  line-height: 1.6;
-}
-
-/* Action Section */
-.action-section {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.btn-complete-delivery {
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-}
-
-.btn-complete-delivery:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
-}
-
-.btn-complete-delivery:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Map Panel */
-.map-panel {
-  background: white;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-}
-
-.map-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-.map-header h3 {
+.ctgh-header-title {
   margin: 0;
   font-size: 20px;
-  color: #333;
-}
-
-.map-loading-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 15px;
-  background: #f0f4ff;
-  border-radius: 20px;
-  font-size: 13px;
-  color: #667eea;
-  font-weight: 600;
-}
-
-.loading-spinner.small {
-  width: 16px;
-  height: 16px;
-  border-width: 2px;
-}
-
-/* Map Wrapper */
-.map-wrapper {
-  flex: 1;
-  min-height: 500px;
-  border-radius: 10px;
+  font-weight: 700;
+  white-space: nowrap;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 15px;
+  text-overflow: ellipsis;
 }
 
-/* Map Popup */
-.map-popup {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* ── Card ────────────────────────────────────────────────── */
+.ctgh-card {
+  background: white;
+  margin: 12px 12px 0;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.ctgh-card h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a202c;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid #f0f0f0;
 }
 
-.map-popup strong {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-  color: #333;
+/* ── Map section ─────────────────────────────────────────── */
+.ctgh-map-section {
+  margin: 12px 12px 0;
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
 }
 
-.map-popup div {
-  font-size: 12px;
-  color: #666;
-  line-height: 1.5;
-}
-
-/* Map Legend */
-.map-legend {
+/* Toggle GPS / Cửa hàng */
+.ctgh-route-toggle {
   display: flex;
-  gap: 20px;
-  padding: 15px;
-  background: #f9f9f9;
-  border-radius: 10px;
-  flex-wrap: wrap;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
+  padding: 10px 10px 0;
   gap: 8px;
-  font-size: 13px;
-  color: #666;
 }
-
-.legend-marker {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.legend-marker.green {
-  background: #4caf50;
-}
-
-.legend-marker.red {
-  background: #f44336;
-}
-
-.legend-marker.blue {
-  background: #2196f3;
-}
-
-.legend-line {
-  width: 30px;
-  height: 4px;
-  background: #8b5cf6;
-  border-radius: 2px;
-}
-
-/* Error Message */
-.error-message {
-  background: #fff3f3;
-  border: 2px solid #ffcdd2;
+.ctgh-toggle-btn {
+  flex: 1;
+  padding: 10px 8px;
+  border: 2px solid #e2e8f0;
   border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #c62828;
-  font-size: 14px;
-}
-
-.btn-retry {
-  padding: 8px 16px;
-  background: #f44336;
-  color: white;
-  border: none;
-  border-radius: 8px;
+  background: #f7fafc;
+  color: #4a5568;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
+  text-align: center;
+}
+.ctgh-toggle-btn.active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+}
+
+/* Route info badge */
+.ctgh-route-badge {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  margin: 8px 10px 0;
+  background: #f0f4ff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4c51bf;
+  justify-content: center;
+}
+.ctgh-route-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 8px 10px 0;
+  background: #f0f4ff;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #667eea;
+  justify-content: center;
+}
+.ctgh-route-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 8px 10px 0;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #c53030;
+}
+.ctgh-route-error button {
+  padding: 4px 10px;
+  background: #fc8181;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ctgh-gps-warning {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 8px 10px 0;
+  background: #fffbeb;
+  border: 1px solid #f6e05e;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #744210;
+}
+.ctgh-gps-warning button {
+  padding: 4px 10px;
+  background: #f6ad55;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
   white-space: nowrap;
 }
 
-.btn-retry:hover:not(:disabled) {
-  background: #d32f2f;
+/* Map wrapper */
+.ctgh-map-wrap {
+  height: 320px;
+  margin-top: 10px;
 }
+.ctgh-map-wrap > * { height: 100% !important; }
 
-.btn-retry:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Legend */
+.ctgh-legend {
+  display: flex;
+  gap: 16px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #4a5568;
+  flex-wrap: wrap;
+  justify-content: center;
 }
-
-/* Loading Container */
-.loading-container,
-.error-container {
-  text-align: center;
-  padding: 80px 20px;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #667eea;
+.ctgh-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
   border-radius: 50%;
-  margin: 0 auto 20px;
-  animation: spin 1s linear infinite;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.ctgh-dot.green  { background: #48bb78; }
+.ctgh-dot.red    { background: #f56565; }
+.ctgh-dot.blue   { background: #4299e1; }
+.ctgh-line {
+  display: inline-block;
+  width: 24px; height: 4px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+/* ── Payment card ────────────────────────────────────────── */
+.ctgh-payment { border-left: 4px solid #f59e0b; }
+.ctgh-payment.vnpay { border-left-color: #22c55e; }
+.ctgh-payment h3 { border-bottom-color: #fef3c7; }
 
-.error-container h2 {
-  color: #f44336;
-  margin-bottom: 20px;
-}
-
-.error-container .btn-back {
-  margin-top: 20px;
-  padding: 12px 30px;
-  background: #667eea;
-  color: white;
-  border: none;
-}
-
-.error-container .btn-back:hover {
-  background: #5568d3;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .chi-tiet-giao-hang-content {
-    grid-template-columns: 350px 1fr;
-  }
-
-  .route-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 992px) {
-  .chi-tiet-giao-hang-content {
-    grid-template-columns: 1fr;
-  }
-
-  .map-panel {
-    order: -1;
-  }
-
-  .map-wrapper {
-    min-height: 400px;
-  }
-}
-
-@media (max-width: 768px) {
-  .chi-tiet-giao-hang-container {
-    padding: 15px;
-  }
-
-  .header-top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .chi-tiet-giao-hang-header h1 {
-    font-size: 22px;
-  }
-
-  .info-item {
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .info-value {
-    text-align: left;
-  }
-
-  .route-stat {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .map-legend {
-    gap: 10px;
-  }
-
-  .legend-item {
-    font-size: 12px;
-  }
-
-  .location-error {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .btn-retry-location {
-    width: 100%;
-  }
-}
-
-thu-tien-section { border-left: 4px solid #f59e0b; }
-
-.thu-tien-box {
-  border-radius: 10px;
-  padding: 14px;
+.ctgh-payment-badge {
   text-align: center;
-}
-.thu-tien-box.cod {
-  background: #fff7ed;
-  border: 2px solid #f59e0b;
-}
-.thu-tien-box.vnpay {
-  background: #f0fdf4;
-  border: 2px solid #22c55e;
-}
-.thu-tien-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-.thu-tien-amount {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #e53e3e;
-  margin-bottom: 4px;
-}
-.thu-tien-box.vnpay .thu-tien-amount { color: #16a34a; }
-.thu-tien-note {
-  font-size: 0.78rem;
-  color: #888;
-}
-
-
-.ghi-chu-section { border-left: 4px solid #a855f7; }
-
-.ghi-chu-box {
-  background: #faf5ff;
-  border: 1.5px solid #d8b4fe;
+  padding: 8px 14px;
   border-radius: 8px;
-  padding: 12px 14px;
-  font-size: 0.95rem;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.ctgh-payment-badge.cod  { background: #fef3c7; color: #92400e; }
+.ctgh-payment-badge.vnpay { background: #d1fae5; color: #065f46; }
+
+.ctgh-payment-rows { display: flex; flex-direction: column; gap: 8px; }
+.ctgh-payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  padding: 6px 0;
+  border-bottom: 1px dashed #f0f0f0;
+}
+.ctgh-payment-row:last-child { border-bottom: none; }
+.ctgh-payment-row.total {
+  font-size: 17px;
+  font-weight: 800;
+  color: #c53030;
+  padding-top: 10px;
+  border-top: 2px solid #fed7d7;
+  border-bottom: none;
+}
+.ctgh-payment-row .paid { color: #276749; font-weight: 600; }
+
+/* ── Note card ───────────────────────────────────────────── */
+.ctgh-note { border-left: 4px solid #a855f7; }
+.ctgh-note p {
+  margin: 0;
+  font-size: 14px;
   color: #4b5563;
   line-height: 1.6;
-  white-space: pre-wrap;
+  background: #faf5ff;
+  border: 1px solid #d8b4fe;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+/* ── Info rows ───────────────────────────────────────────── */
+.ctgh-info-rows { display: flex; flex-direction: column; gap: 0; }
+.ctgh-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  font-size: 14px;
+  border-bottom: 1px solid #f7f7f7;
+}
+.ctgh-info-row:last-child { border-bottom: none; }
+.ctgh-info-row span:first-child { color: #718096; font-weight: 500; }
+.ctgh-info-row span:last-child  { color: #2d3748; font-weight: 600; text-align: right; }
+.ctgh-phone-link {
+  color: #3182ce;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 15px;
+}
+.ctgh-highlight { color: #667eea; font-weight: 800; font-size: 16px; }
+.mono { font-family: 'Courier New', monospace; font-size: 13px; color: #3182ce; }
+
+/* ── Address card ────────────────────────────────────────── */
+.ctgh-address-card { border-left: 4px solid #667eea; }
+.ctgh-address-text { margin: 0 0 10px; font-size: 15px; color: #2d3748; line-height: 1.6; }
+.ctgh-open-maps {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #ebf8ff;
+  color: #2b6cb0;
+  border: 1px solid #bee3f8;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.ctgh-open-maps:hover { background: #bee3f8; }
+
+/* ── GPS card ────────────────────────────────────────────── */
+.ctgh-gps-card { border-left: 4px solid #4299e1; }
+.ctgh-gps-loading {
+  display: flex; align-items: center; gap: 8px;
+  color: #4299e1; font-size: 13px;
+}
+.ctgh-gps-error {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px; background: #fff5f5;
+  border: 1px solid #fed7d7; border-radius: 8px;
+  font-size: 13px; color: #c53030; gap: 8px;
+}
+.ctgh-gps-error button {
+  padding: 5px 10px; background: #fc8181; color: white;
+  border: none; border-radius: 6px; font-size: 12px; cursor: pointer;
+  white-space: nowrap;
+}
+.ctgh-gps-info { display: flex; flex-direction: column; gap: 0; }
+.ctgh-btn-refresh-gps {
+  margin-top: 10px; width: 100%; padding: 10px;
+  background: #ebf8ff; color: #2b6cb0;
+  border: 1px solid #bee3f8; border-radius: 8px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+.ctgh-btn-refresh-gps:hover { background: #bee3f8; }
+
+/* ── Complete section (sticky bottom) ───────────────────── */
+.ctgh-complete-section {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  padding: 12px 16px;
+  background: white;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  z-index: 99;
+}
+.ctgh-btn-complete {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 15px rgba(72,187,120,0.35);
+  letter-spacing: 0.3px;
+}
+.ctgh-btn-complete:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(72,187,120,0.45);
+}
+.ctgh-btn-complete:disabled {
+  opacity: 0.6; cursor: not-allowed; transform: none;
+}
+
+/* ── Spinner ─────────────────────────────────────────────── */
+.ctgh-loading {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px 20px;
+  background: white; border-radius: 14px;
+  margin: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.ctgh-spinner {
+  width: 44px; height: 44px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: ctgh-spin 0.9s linear infinite;
+}
+.ctgh-spinner.small {
+  width: 16px; height: 16px;
+  border-width: 2px; margin: 0;
+}
+@keyframes ctgh-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Desktop: side-by-side layout ───────────────────────── */
+@media (min-width: 900px) {
+  .ctgh-container {
+    max-width: 1400px;
+    padding-bottom: 0;
+  }
+
+  .ctgh-complete-section {
+    position: static;
+    padding: 0;
+    box-shadow: none;
+    margin: 12px 12px 24px;
+  }
+  .ctgh-btn-complete {
+    border-radius: 12px;
+  }
+
+  /* Chia 2 cột: info bên trái, map bên phải */
+  .ctgh-desktop-layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 0;
+    align-items: start;
+  }
+
+  .ctgh-map-section {
+    position: sticky;
+    top: 70px;
+    margin: 12px 12px 0 0;
+  }
+
+  .ctgh-map-wrap {
+    height: 480px;
+  }
 }
