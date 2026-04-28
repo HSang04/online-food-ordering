@@ -79,7 +79,7 @@ const DonChoNhan = () => {
       );
 
       if (response.data) {
-        showToast(`✅ Nhận đơn #${orderId} thành công!`, "success");
+        showToast(` Nhận đơn #${orderId} thành công!`, "success");
         // Xóa đơn khỏi danh sách ngay lập tức (không cần chờ refresh)
         setDonChoNhan((prev) => prev.filter((order) => order.id !== orderId));
       }
@@ -94,7 +94,7 @@ const DonChoNhan = () => {
         // Refresh danh sách để loại đơn đã bị lấy
         fetchDonChoNhan();
       } else {
-        showToast(`❌ Lỗi: ${msg}`, "error");
+        showToast(` Lỗi: ${msg}`, "error");
         // Re-enable nút nếu lỗi khác (để shipper thử lại)
         setNhanDonLoading((prev) => ({ ...prev, [orderId]: false }));
       }
@@ -133,9 +133,9 @@ const DonChoNhan = () => {
     return (
       <div className="don-cho-nhan-container">
         <div className="error-message">
-          ⚠️ {error}
+           {error}
           <button onClick={fetchDonChoNhan} className="btn-retry">
-            🔄 Thử lại
+             Thử lại
           </button>
         </div>
       </div>
@@ -152,7 +152,7 @@ const DonChoNhan = () => {
       )}
 
       <header className="don-cho-nhan-header">
-        <h1>📥 Đơn hàng chờ nhận</h1>
+        <h1> Đơn hàng chờ nhận</h1>
         <p>Tổng: {donChoNhan.length} đơn đang chờ</p>
       </header>
 
@@ -165,7 +165,7 @@ const DonChoNhan = () => {
           className="search-input"
         />
         <button onClick={fetchDonChoNhan} className="btn-refresh">
-          🔄 Làm mới
+           Làm mới
         </button>
       </div>
 
@@ -189,39 +189,39 @@ const DonChoNhan = () => {
 
               <div className="don-item-body">
                 <div className="don-info-row">
-                  <span className="label">👤 Khách hàng:</span>
+                  <span className="label"> Khách hàng:</span>
                   <span className="value">
                     {order.nguoiDung?.hoTen || order.nguoiDung?.tenNguoiDung || "N/A"}
                   </span>
                 </div>
 
                 <div className="don-info-row">
-                  <span className="label">📞 Điện thoại:</span>
+                  <span className="label"> Điện thoại:</span>
                   <span className="value">
                     {order.nguoiDung?.soDienThoai || order.nguoiDung?.sdt || "N/A"}
                   </span>
                 </div>
 
                 <div className="don-info-row">
-                  <span className="label">📍 Địa chỉ:</span>
+                  <span className="label"> Địa chỉ:</span>
                   <span className="value">{order.diaChiGiaoHang || "Chưa có"}</span>
                 </div>
 
                 <div className="don-info-row">
-                  <span className="label">💰 Tổng tiền:</span>
+                  <span className="label"> Tổng tiền:</span>
                   <span className="value highlight">
                     {order.tongTien?.toLocaleString()}₫
                   </span>
                 </div>
 
                 <div className="don-info-row">
-                  <span className="label">📅 Thời gian đặt:</span>
+                  <span className="label"> Thời gian đặt:</span>
                   <span className="value">{formatDateTime(order.ngayTao)}</span>
                 </div>
 
                 {order.ghiChu && (
                   <div className="don-info-row">
-                    <span className="label">📝 Ghi chú:</span>
+                    <span className="label"> Ghi chú:</span>
                     <span className="value">{order.ghiChu}</span>
                   </div>
                 )}
@@ -233,7 +233,7 @@ const DonChoNhan = () => {
                   className={`btn-nhan-don ${nhanDonLoading[order.id] ? "loading" : ""}`}
                   disabled={!!nhanDonLoading[order.id]}
                 >
-                  {nhanDonLoading[order.id] ? "⏳ Đang xử lý..." : "✅ Nhận đơn"}
+                  {nhanDonLoading[order.id] ? " Đang xử lý..." : " Nhận đơn"}
                 </button>
               </div>
             </div>

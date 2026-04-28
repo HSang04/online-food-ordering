@@ -35,15 +35,14 @@
   background: rgba(255,255,255,0.2);
   border: none;
   color: white;
-  padding: 12px 20px;
+  padding: 12px 16px;   
   border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
   font-weight: 600;
   transition: all 0.3s ease;
-  min-width: 200px;
+  display: none;
 }
 
 .menu-toggle:hover {
@@ -821,5 +820,10 @@
   .sale-badge {
     font-size: 10px;
     padding: 3px 6px;
+  }
+}
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex; 
   }
 }

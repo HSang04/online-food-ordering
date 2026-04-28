@@ -111,7 +111,7 @@ public class AuthController {
                 requestLogin.getMatKhau()
             );
 
-            // Sử dụng service thay vì repository trực tiếp
+      
             Optional<NguoiDung> nguoiDungOpt = nguoiDungService.getByUsername(requestLogin.getUsername());
             if (nguoiDungOpt.isEmpty()) {
                 throw new UsernameNotFoundException("Không tìm thấy người dùng");
@@ -151,20 +151,18 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         try {
-            // Sử dụng service để tìm user và validate
+           
             NguoiDung nguoiDung = nguoiDungService.findByEmailForPasswordReset(request.getEmail());
             
-            // Tạo token reset password
+        
             String resetToken = UUID.randomUUID().toString();
             
-            // Lưu token vào memory với thời gian hết hạn 15 phút
+            // luu token tam vao memory 
             TokenData tokenData = new TokenData(nguoiDung.getId(), LocalDateTime.now().plusMinutes(15));
             tokenStorage.put(resetToken, tokenData);
 
-            // Dọn dẹp token hết hạn
+           
             cleanExpiredTokens();
-
-            // Gửi email
             emailService.sendResetPasswordEmail(nguoiDung.getEmail(), resetToken);
 
             return ResponseEntity.ok(Collections.singletonMap("message", 
@@ -184,7 +182,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         try {
-            // Kiểm tra token có tồn tại không
+            // check token
             TokenData tokenData = tokenStorage.get(request.getToken());
             
             if (tokenData == null) {
@@ -194,7 +192,7 @@ public class AuthController {
             }
 
             if (tokenData.getExpiryTime().isBefore(LocalDateTime.now())) {
-                tokenStorage.remove(request.getToken()); // Xóa token hết hạn
+                tokenStorage.remove(request.getToken()); 
                 return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(Collections.singletonMap("message", "Token đã hết hạn."));
@@ -229,9 +227,9 @@ public class AuthController {
                     .body(Collections.singletonMap("message", "Token không hợp lệ."));
             }
 
-            // Kiểm tra token có hết hạn không
+          
             if (tokenData.getExpiryTime().isBefore(LocalDateTime.now())) {
-                tokenStorage.remove(request.getToken()); // Xóa token hết hạn
+                tokenStorage.remove(request.getToken());
                 return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(Collections.singletonMap("message", "Token đã hết hạn."));

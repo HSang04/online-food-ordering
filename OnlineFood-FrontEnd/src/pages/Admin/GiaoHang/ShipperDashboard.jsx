@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import DonChoNhan from './DonChoNhan';         // ✅ Thêm import
-import GiaoHang from './GiaoHang';            // ✅ Thêm import
+import DonChoNhan from './DonChoNhan';         
+import GiaoHang from './GiaoHang';          
 import './ShipperDashboard.css';
 
 const ShipperDashboard = () => {
@@ -13,13 +13,13 @@ const ShipperDashboard = () => {
           className={`tab-btn ${activeTab === 'cho-nhan' ? 'active' : ''}`}
           onClick={() => setActiveTab('cho-nhan')}
         >
-          📥 Đơn chờ nhận
+           Đơn chờ nhận
         </button>
         <button
           className={`tab-btn ${activeTab === 'dang-giao' ? 'active' : ''}`}
           onClick={() => setActiveTab('dang-giao')}
         >
-          🚚 Đơn đang giao
+           Đơn đang giao
         </button>
       </div>
 

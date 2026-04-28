@@ -170,7 +170,7 @@ const MapConfirmModal = ({ isOpen, lat, lng, diaChi, onConfirm, onCancel }) => {
         {/* Header */}
         <div className="map-modal__header">
           <div className="map-modal__title">
-            <span className="map-modal__title-icon">📍</span>
+            <span className="map-modal__title-icon"></span>
             <div>
               <h3>Xác nhận vị trí giao hàng</h3>
               <p className="map-modal__subtitle">{diaChi}</p>
@@ -181,7 +181,7 @@ const MapConfirmModal = ({ isOpen, lat, lng, diaChi, onConfirm, onCancel }) => {
 
         {/* Huong dan */}
         <div className="map-modal__hint">
-          <span>💡</span>
+          <span></span>
           <span>
             Kiểm tra marker có đúng vị trí không. Nếu chưa đúng, hãy
             <strong> kéo marker</strong> đến vị trí chính xác hơn.
@@ -203,7 +203,7 @@ const MapConfirmModal = ({ isOpen, lat, lng, diaChi, onConfirm, onCancel }) => {
         {/* Thong tin vi tri */}
         <div className="map-modal__info">
           <div className="map-modal__coords">
-            <span>🧭</span>
+            <span></span>
             <span>
               {currentLat?.toFixed(6)}, {currentLng?.toFixed(6)}
             </span>
@@ -230,7 +230,7 @@ const MapConfirmModal = ({ isOpen, lat, lng, diaChi, onConfirm, onCancel }) => {
             Nhập lại địa chỉ
           </button>
           <button className="map-modal__btn-confirm" onClick={handleConfirm}>
-            ✅ Xác nhận vị trí này
+             Xác nhận vị trí này
           </button>
         </div>
 

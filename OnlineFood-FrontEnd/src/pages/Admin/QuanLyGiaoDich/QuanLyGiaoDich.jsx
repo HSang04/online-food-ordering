@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Filter, Eye, RefreshCw, DollarSign, CreditCard, Clock, CheckCircle, XCircle, AlertCircle, FileText, User, Package } from 'lucide-react';
+import { Search, Filter, Eye, RefreshCw, DollarSign, CreditCard, Clock, CheckCircle, XCircle, AlertCircle, FileText, User, Package, RotateCcw } from 'lucide-react';
 import axios from '../../../services/axiosInstance';
 import './QuanLyGiaoDich.css';
 
@@ -10,6 +10,8 @@ const QuanLyGiaoDich = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedHoaDon, setSelectedHoaDon] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundTarget, setRefundTarget] = useState(null);
   const [error, setError] = useState('');
 
   const [filters, setFilters] = useState({
@@ -30,24 +32,24 @@ const QuanLyGiaoDich = () => {
     setLoading(true);
     setError('');
     try {
-        const jwt = getAuthToken();
-        const response = await axios.get('/hoa-don', {
+      const jwt = getAuthToken();
+      const response = await axios.get('/hoa-don', {
         headers: {
-            'Authorization': `Bearer ${jwt}`
+          'Authorization': `Bearer ${jwt}`
         }
-        });
+      });
 
-        const sortedData = response.data.sort((a, b) => {
+      const sortedData = response.data.sort((a, b) => {
         return new Date(b.thoiGianThanhToan) - new Date(a.thoiGianThanhToan);
-        });
+      });
 
-        setHoaDonList(sortedData);
-        setFilteredHoaDon(sortedData);
+      setHoaDonList(sortedData);
+      setFilteredHoaDon(sortedData);
     } catch (error) {
-        console.error('Lỗi khi tải dữ liệu hóa đơn:', error);
-        setError('Có lỗi xảy ra khi tải dữ liệu hóa đơn: ' + (error.response?.data?.message || error.message));
+      console.error('Lỗi khi tải dữ liệu hóa đơn:', error);
+      setError('Có lỗi xảy ra khi tải dữ liệu hóa đơn: ' + (error.response?.data?.message || error.message));
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   }, []);
 
@@ -58,47 +60,47 @@ const QuanLyGiaoDich = () => {
   const viewHoaDonDetail = async (hoaDonId, donHangId) => {
     setLoading(true);
     try {
-        const jwt = getAuthToken();
-        const vaiTro = localStorage.getItem('vaiTro');
-        const idNguoiDung = localStorage.getItem('idNguoiDung');
+      const jwt = getAuthToken();
+      const vaiTro = localStorage.getItem('vaiTro');
+      const idNguoiDung = localStorage.getItem('idNguoiDung');
 
-        if (!jwt || !idNguoiDung) {
+      if (!jwt || !idNguoiDung) {
         alert('Vui lòng đăng nhập để xem hóa đơn');
         return;
-        }
+      }
 
-        const userResponse = await axios.get(`/nguoi-dung/secure/${idNguoiDung}`, {
+      const userResponse = await axios.get(`/nguoi-dung/secure/${idNguoiDung}`, {
         headers: {
-            Authorization: `Bearer ${jwt}`, 
+          Authorization: `Bearer ${jwt}`,
         },
-        });
-        
-        const userEmail = userResponse.data.email;
+      });
 
-        const response = await axios.get(`/hoa-don/don-hang/${donHangId}`, {
+      const userEmail = userResponse.data.email;
+
+      const response = await axios.get(`/hoa-don/don-hang/${donHangId}`, {
         headers: {
-            'Authorization': `Bearer ${jwt}`,
-            'User-Email': userEmail,
-            'User-Role': vaiTro
+          'Authorization': `Bearer ${jwt}`,
+          'User-Email': userEmail,
+          'User-Role': vaiTro
         }
-        });
+      });
 
-        setSelectedHoaDon(response.data);
-        setShowDetailModal(true);
+      setSelectedHoaDon(response.data);
+      setShowDetailModal(true);
     } catch (error) {
-        console.error('Lỗi khi xem chi tiết hóa đơn:', error);
-        
-        if (error.response?.status === 401) {
+      console.error('Lỗi khi xem chi tiết hóa đơn:', error);
+
+      if (error.response?.status === 401) {
         alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-        } else if (error.response?.status === 403) {
+      } else if (error.response?.status === 403) {
         alert('Bạn không có quyền xem hóa đơn này.');
-        } else if (error.response?.status === 404) {
+      } else if (error.response?.status === 404) {
         alert('Không tìm thấy hóa đơn cho đơn hàng này');
-        } else {
+      } else {
         alert('Có lỗi xảy ra khi xem chi tiết hóa đơn: ' + (error.response?.data?.message || error.message));
-        }
+      }
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -126,39 +128,84 @@ const QuanLyGiaoDich = () => {
     }
   };
 
+  // Mở modal hoàn tiền
+  const openRefundModal = (hoaDon) => {
+    setRefundTarget(hoaDon);
+    setShowRefundModal(true);
+  };
+
+  // Thực hiện hoàn tiền
+  const thucHienHoanTien = async () => {
+    if (!refundTarget) return;
+
+    setLoading(true);
+    try {
+      const jwt = getAuthToken();
+      const response = await axios.put(
+        `/hoa-don/hoan-tien/${refundTarget.donHang?.id}`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${jwt}`,
+          }
+        }
+      );
+
+      alert(response.data.message || 'Hoàn tiền thành công');
+      setShowRefundModal(false);
+      setRefundTarget(null);
+      if (showDetailModal) setShowDetailModal(false);
+      await loadHoaDonData();
+    } catch (error) {
+      console.error('Lỗi khi hoàn tiền:', error);
+      alert('Có lỗi xảy ra khi hoàn tiền: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Kiểm tra điều kiện cần hoàn tiền: đã thanh toán VÀ đơn hàng đã hủy
+  const canRefund = (hoaDon) => {
+    return (
+      hoaDon.trangThai === 'DA_THANH_TOAN' &&
+      hoaDon.donHang?.trangThai === 'DA_HUY' &&
+      hoaDon.phuongThuc !== 'COD'
+    );
+  };
+
   const applyFilters = useCallback(() => {
     let filtered = hoaDonList;
 
     if (searchTerm) {
-    filtered = filtered.filter(hd => 
+      filtered = filtered.filter(hd =>
         hd.hoTen?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         hd.maGD?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         hd.soDienThoai?.includes(searchTerm) ||
         hd.donHang?.id?.toString().includes(searchTerm) ||
         hd.id?.toString().includes(searchTerm)
-    );
+      );
     }
 
     if (filters.trangThai !== 'ALL') {
-    filtered = filtered.filter(hd => hd.trangThai === filters.trangThai);
+      filtered = filtered.filter(hd => hd.trangThai === filters.trangThai);
     }
 
     if (filters.phuongThuc !== 'ALL') {
-    filtered = filtered.filter(hd => hd.phuongThuc === filters.phuongThuc);
+      filtered = filtered.filter(hd => hd.phuongThuc === filters.phuongThuc);
     }
 
     if (filters.ngayBatDau && filters.ngayKetThuc) {
-    filtered = filtered.filter(hd => {
+      filtered = filtered.filter(hd => {
         const ngayThanhToan = new Date(hd.thoiGianThanhToan);
         const ngayBatDau = new Date(filters.ngayBatDau);
         const ngayKetThuc = new Date(filters.ngayKetThuc);
         ngayKetThuc.setHours(23, 59, 59, 999);
         return ngayThanhToan >= ngayBatDau && ngayThanhToan <= ngayKetThuc;
-    });
+      });
     }
 
     filtered.sort((a, b) => {
-    return new Date(b.thoiGianThanhToan) - new Date(a.thoiGianThanhToan);
+      return new Date(b.thoiGianThanhToan) - new Date(a.thoiGianThanhToan);
     });
 
     setFilteredHoaDon(filtered);
@@ -210,29 +257,34 @@ const QuanLyGiaoDich = () => {
 
   const getStatusBadge = (trangThai) => {
     const statusConfig = {
-      'DA_THANH_TOAN': { 
-        icon: CheckCircle, 
-        className: 'quanlygiaodich-status-badge paid', 
-        text: 'Đã thanh toán' 
+      'DA_THANH_TOAN': {
+        icon: CheckCircle,
+        className: 'quanlygiaodich-status-badge paid',
+        text: 'Đã thanh toán'
       },
-      'CHUA_THANH_TOAN': { 
-        icon: Clock, 
-        className: 'quanlygiaodich-status-badge pending', 
-        text: 'Chưa thanh toán' 
+      'CHUA_THANH_TOAN': {
+        icon: Clock,
+        className: 'quanlygiaodich-status-badge pending',
+        text: 'Chưa thanh toán'
       },
-      'HUY': { 
-        icon: XCircle, 
-        className: 'quanlygiaodich-status-badge cancelled', 
-        text: 'Đã hủy' 
+      'HUY': {
+        icon: XCircle,
+        className: 'quanlygiaodich-status-badge cancelled',
+        text: 'Đã hủy'
+      },
+      'DA_HOAN_TRA': {
+        icon: RotateCcw,
+        className: 'quanlygiaodich-status-badge refunded',
+        text: 'Đã hoàn trả'
       }
     };
 
-    const config = statusConfig[trangThai] || { 
-      icon: AlertCircle, 
-      className: 'quanlygiaodich-status-badge default', 
-      text: trangThai 
+    const config = statusConfig[trangThai] || {
+      icon: AlertCircle,
+      className: 'quanlygiaodich-status-badge default',
+      text: trangThai
     };
-    
+
     const Icon = config.icon;
 
     return (
@@ -249,9 +301,9 @@ const QuanLyGiaoDich = () => {
       'VNPAY': { className: 'quanlygiaodich-payment-badge vnpay', text: 'VNPay' }
     };
 
-    const config = methodConfig[phuongThuc] || { 
-      className: 'quanlygiaodich-payment-badge default', 
-      text: phuongThuc 
+    const config = methodConfig[phuongThuc] || {
+      className: 'quanlygiaodich-payment-badge default',
+      text: phuongThuc
     };
 
     return (
@@ -262,10 +314,12 @@ const QuanLyGiaoDich = () => {
     );
   };
 
+  // Chỉ tính doanh thu từ hóa đơn DA_THANH_TOAN và KHÔNG phải DA_HOAN_TRA
   const statistics = {
     tongSoHoaDon: filteredHoaDon.length,
     daThanhToan: filteredHoaDon.filter(hd => hd.trangThai === 'DA_THANH_TOAN').length,
     chuaThanhToan: filteredHoaDon.filter(hd => hd.trangThai === 'CHUA_THANH_TOAN').length,
+    daHoanTra: filteredHoaDon.filter(hd => hd.trangThai === 'DA_HOAN_TRA').length,
     tongDoanhThu: filteredHoaDon
       .filter(hd => hd.trangThai === 'DA_THANH_TOAN')
       .reduce((sum, hd) => sum + (hd.tongTien || 0), 0)
@@ -294,7 +348,6 @@ const QuanLyGiaoDich = () => {
           </div>
         </div>
 
-      
         {error && (
           <div className="quanlygiaodich-error-alert">
             <div className="quanlygiaodich-error-content">
@@ -304,7 +357,6 @@ const QuanLyGiaoDich = () => {
           </div>
         )}
 
-     
         <div className="quanlygiaodich-stats">
           <div className="quanlygiaodich-stat-card">
             <div className="quanlygiaodich-stat-content">
@@ -344,6 +396,18 @@ const QuanLyGiaoDich = () => {
 
           <div className="quanlygiaodich-stat-card">
             <div className="quanlygiaodich-stat-content">
+              <div className="quanlygiaodich-stat-icon orange">
+                <RotateCcw className="w-6 h-6 text-orange-500" />
+              </div>
+              <div className="quanlygiaodich-stat-info">
+                <p>Đã hoàn trả</p>
+                <p>{statistics.daHoanTra}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="quanlygiaodich-stat-card">
+            <div className="quanlygiaodich-stat-content">
               <div className="quanlygiaodich-stat-icon purple">
                 <DollarSign className="w-6 h-6 text-purple-600" />
               </div>
@@ -355,7 +419,6 @@ const QuanLyGiaoDich = () => {
           </div>
         </div>
 
-     
         <div className="quanlygiaodich-filters">
           <div className="quanlygiaodich-filters-grid">
             <div className="quanlygiaodich-search-wrapper">
@@ -378,6 +441,7 @@ const QuanLyGiaoDich = () => {
               <option value="DA_THANH_TOAN">Đã thanh toán</option>
               <option value="CHUA_THANH_TOAN">Chưa thanh toán</option>
               <option value="HUY">Đã hủy</option>
+              <option value="DA_HOAN_TRA">Đã hoàn trả</option>
             </select>
 
             <select
@@ -419,7 +483,6 @@ const QuanLyGiaoDich = () => {
           </div>
         </div>
 
-    
         <div className="quanlygiaodich-table-container">
           {loading ? (
             <div className="quanlygiaodich-loading">
@@ -482,8 +545,11 @@ const QuanLyGiaoDich = () => {
                           </div>
                         </td>
                         <td className="quanlygiaodich-table-cell">
-                          <div className="quanlygiaodich-amount">
+                          <div className={`quanlygiaodich-amount ${hoaDon.trangThai === 'DA_HOAN_TRA' ? 'refunded' : ''}`}>
                             {formatCurrency(hoaDon.tongTien)}
+                            {hoaDon.trangThai === 'DA_HOAN_TRA' && (
+                              <span className="quanlygiaodich-not-counted">Không tính DT</span>
+                            )}
                           </div>
                         </td>
                         <td className="quanlygiaodich-table-cell">
@@ -501,7 +567,7 @@ const QuanLyGiaoDich = () => {
                             >
                               <Eye className="w-4 h-4" />
                             </button>
-                            
+
                             {hoaDon.phuongThuc === 'COD' && hoaDon.trangThai === 'CHUA_THANH_TOAN' && (
                               <button
                                 onClick={() => capNhatThanhToanHoanThanh(hoaDon.donHang?.id)}
@@ -509,6 +575,16 @@ const QuanLyGiaoDich = () => {
                                 title="Xác nhận đã thanh toán"
                               >
                                 <CheckCircle className="w-4 h-4" />
+                              </button>
+                            )}
+
+                            {canRefund(hoaDon) && (
+                              <button
+                                onClick={() => openRefundModal(hoaDon)}
+                                className="quanlygiaodich-action-btn refund"
+                                title="Hoàn tiền"
+                              >
+                                <RotateCcw className="w-4 h-4" />
                               </button>
                             )}
                           </div>
@@ -519,7 +595,6 @@ const QuanLyGiaoDich = () => {
                 </table>
               </div>
 
-             
               {totalPages > 1 && (
                 <div className="quanlygiaodich-pagination">
                   <div className="quanlygiaodich-pagination-mobile">
@@ -556,9 +631,7 @@ const QuanLyGiaoDich = () => {
                           <button
                             key={i + 1}
                             onClick={() => setCurrentPage(i + 1)}
-                            className={`quanlygiaodich-pagination-number ${
-                              currentPage === i + 1 ? 'active' : ''
-                            }`}
+                            className={`quanlygiaodich-pagination-number ${currentPage === i + 1 ? 'active' : ''}`}
                           >
                             {i + 1}
                           </button>
@@ -573,6 +646,7 @@ const QuanLyGiaoDich = () => {
         </div>
       </div>
 
+      {/* Modal chi tiết hóa đơn */}
       {showDetailModal && selectedHoaDon && (
         <div className="quanlygiaodich-modal-overlay">
           <div className="quanlygiaodich-modal-container">
@@ -624,8 +698,11 @@ const QuanLyGiaoDich = () => {
                     </div>
                     <div className="quanlygiaodich-modal-row">
                       <span className="quanlygiaodich-modal-label">Tổng tiền:</span>
-                      <span className="quanlygiaodich-modal-value large">
+                      <span className={`quanlygiaodich-modal-value large ${selectedHoaDon.trangThai === 'DA_HOAN_TRA' ? 'refunded-amount' : ''}`}>
                         {formatCurrency(selectedHoaDon.tongTien)}
+                        {selectedHoaDon.trangThai === 'DA_HOAN_TRA' && (
+                          <span className="quanlygiaodich-not-counted-modal"> (Không tính doanh thu)</span>
+                        )}
                       </span>
                     </div>
                   </div>
@@ -689,20 +766,33 @@ const QuanLyGiaoDich = () => {
               )}
 
               <div className="quanlygiaodich-modal-actions">
-                {selectedHoaDon.phuongThuc === 'COD' && 
-                 selectedHoaDon.trangThai === 'CHUA_THANH_TOAN' && (
+                {selectedHoaDon.phuongThuc === 'COD' &&
+                  selectedHoaDon.trangThai === 'CHUA_THANH_TOAN' && (
+                    <button
+                      onClick={() => {
+                        capNhatThanhToanHoanThanh(selectedHoaDon.donHang?.id);
+                        setShowDetailModal(false);
+                      }}
+                      className="quanlygiaodich-modal-btn confirm"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Xác nhận đã thanh toán
+                    </button>
+                  )}
+
+                {canRefund(selectedHoaDon) && (
                   <button
                     onClick={() => {
-                      capNhatThanhToanHoanThanh(selectedHoaDon.donHang?.id);
                       setShowDetailModal(false);
+                      openRefundModal(selectedHoaDon);
                     }}
-                    className="quanlygiaodich-modal-btn confirm"
+                    className="quanlygiaodich-modal-btn refund"
                   >
-                    <CheckCircle className="w-4 h-4" />
-                    Xác nhận đã thanh toán
+                    <RotateCcw className="w-4 h-4" />
+                    Hoàn tiền
                   </button>
                 )}
-                
+
                 <button
                   onClick={() => setShowDetailModal(false)}
                   className="quanlygiaodich-modal-btn close"
@@ -710,6 +800,95 @@ const QuanLyGiaoDich = () => {
                   Đóng
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal xác nhận hoàn tiền */}
+      {showRefundModal && refundTarget && (
+        <div className="quanlygiaodich-modal-overlay">
+          <div className="quanlygiaodich-refund-modal-container">
+            <div className="quanlygiaodich-refund-modal-icon">
+              <RotateCcw className="w-10 h-10 text-orange-500" />
+            </div>
+
+            <h3 className="quanlygiaodich-refund-modal-title">Xác nhận hoàn tiền</h3>
+            <p className="quanlygiaodich-refund-modal-desc">
+              Bạn có chắc muốn hoàn tiền cho đơn hàng <strong>#{refundTarget.donHang?.id}</strong> không?
+              <br />Thao tác này không thể hoàn tác.
+            </p>
+
+            <div className="quanlygiaodich-refund-info-box">
+              <div className="quanlygiaodich-refund-info-row">
+                <span className="quanlygiaodich-refund-info-label">Khách hàng:</span>
+                <span className="quanlygiaodich-refund-info-value">{refundTarget.hoTen}</span>
+              </div>
+              <div className="quanlygiaodich-refund-info-row">
+                <span className="quanlygiaodich-refund-info-label">Số tiền hoàn:</span>
+                <span className="quanlygiaodich-refund-info-value highlight">
+                  {formatCurrency(refundTarget.tongTien)}
+                </span>
+              </div>
+              <div className="quanlygiaodich-refund-info-row">
+                <span className="quanlygiaodich-refund-info-label">Phương thức:</span>
+                <span>{getPaymentMethodBadge(refundTarget.phuongThuc)}</span>
+              </div>
+              {refundTarget.maGD && (
+                <div className="quanlygiaodich-refund-magd-box">
+                  <span className="quanlygiaodich-refund-info-label">Mã giao dịch gốc:</span>
+                  <div className="quanlygiaodich-refund-magd-value">
+                    <span>{refundTarget.maGD}</span>
+                    <button
+                      className="quanlygiaodich-copy-btn"
+                      title="Sao chép mã GD"
+                      onClick={() => {
+                        navigator.clipboard.writeText(refundTarget.maGD);
+                      }}
+                    >
+                      Sao chép
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="quanlygiaodich-refund-modal-note">
+              <AlertCircle className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+              <span>
+                Sau khi hoàn tiền, trạng thái sẽ chuyển thành <strong>Đã hoàn trả</strong> và
+                số tiền này sẽ <strong>không được tính vào doanh thu</strong>.
+              </span>
+            </div>
+
+            <div className="quanlygiaodich-refund-modal-actions">
+              <button
+                onClick={() => {
+                  setShowRefundModal(false);
+                  setRefundTarget(null);
+                }}
+                className="quanlygiaodich-modal-btn close"
+                disabled={loading}
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={thucHienHoanTien}
+                className="quanlygiaodich-modal-btn refund"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <div className="quanlygiaodich-btn-spinner"></div>
+                    Đang xử lý...
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="w-4 h-4" />
+                    Xác nhận hoàn tiền
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

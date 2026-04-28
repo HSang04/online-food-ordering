@@ -305,7 +305,7 @@ const QuanLyCuaHang = () => {
 
   return (
     <div className="qlch-container">
-      <h2>⚙️ Quản Lý Thông Tin Cửa Hàng</h2>
+      <h2>Quản Lý Thông Tin Cửa Hàng</h2>
 
       {/* Trạng thái mở/đóng */}
       {cuaHangStatus && (
@@ -313,7 +313,7 @@ const QuanLyCuaHang = () => {
           <div className="qlch-status-indicator">
             <span className={`qlch-status-dot ${cuaHangStatus.isOpen ? 'open' : 'closed'}`} />
             <span className="qlch-status-text">
-              {cuaHangStatus.isOpen ? '🟢 ĐANG MỞ CỬA' : '🔴 ĐANG ĐÓNG CỬA'}
+              {cuaHangStatus.isOpen ? ' ĐANG MỞ CỬA' : ' ĐANG ĐÓNG CỬA'}
             </span>
           </div>
           <p className="qlch-status-info">{cuaHangStatus.thongTin}</p>
@@ -322,10 +322,10 @@ const QuanLyCuaHang = () => {
 
       <div className="qlch-card">
         <div className="qlch-card-header">
-          <h3>📋 Thông tin cửa hàng</h3>
+          <h3> Thông tin cửa hàng</h3>
           {!isEditing && (
             <button className="qlch-btn qlch-btn-edit" onClick={handleEdit}>
-              ✏️ Chỉnh sửa
+               Chỉnh sửa
             </button>
           )}
         </div>
@@ -348,7 +348,7 @@ const QuanLyCuaHang = () => {
             {/* Map xem vị trí (view mode) */}
             {cuaHang?.viDo && cuaHang?.kinhDo && (
               <div className="qlch-map-preview">
-                <div className="qlch-map-label">🗺️ Vị trí cửa hàng trên bản đồ</div>
+                <div className="qlch-map-label"> Vị trí cửa hàng trên bản đồ</div>
                 <div className="qlch-map-wrapper">
                   <MapContainer
                     center={[cuaHang.viDo, cuaHang.kinhDo]}
@@ -362,7 +362,7 @@ const QuanLyCuaHang = () => {
                     />
                     <Marker position={[cuaHang.viDo, cuaHang.kinhDo]} icon={storeIcon}>
                       <Popup>
-                        <strong>🏪 {cuaHang.ten}</strong><br />
+                        <strong> {cuaHang.ten}</strong><br />
                         {cuaHang.diaChi}
                       </Popup>
                     </Marker>
@@ -397,9 +397,9 @@ const QuanLyCuaHang = () => {
                 placeholder="Nhập địa chỉ chi tiết (số nhà, đường, phường/xã, quận/huyện, thành phố)"
               />
               <small className="qlch-hint">
-                💡 Tọa độ sẽ tự động tìm sau khi bạn nhập địa chỉ. Bản đồ sẽ hiện để xác nhận vị trí.
+                 Tọa độ sẽ tự động tìm sau khi bạn nhập địa chỉ. Bản đồ sẽ hiện để xác nhận vị trí.
               </small>
-              {geocodeError && <p className="qlch-geocode-error">⚠️ {geocodeError}</p>}
+              {geocodeError && <p className="qlch-geocode-error"> {geocodeError}</p>}
             </div>
 
             <div className="qlch-form-group">
@@ -500,8 +500,8 @@ const QuanLyCuaHang = () => {
             )}
 
             <div className="qlch-form-actions">
-              <button type="submit" className="qlch-btn qlch-btn-save">💾 Lưu thay đổi</button>
-              <button type="button" className="qlch-btn qlch-btn-cancel" onClick={handleCancel}>❌ Hủy</button>
+              <button type="submit" className="qlch-btn qlch-btn-save"> Lưu thay đổi</button>
+              <button type="button" className="qlch-btn qlch-btn-cancel" onClick={handleCancel}>Hủy</button>
             </div>
           </form>
         )}

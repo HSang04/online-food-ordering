@@ -221,7 +221,7 @@ const MenuMonAn = () => {
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               <i className="fas fa-bars"></i>
-              <span>DANH MỤC MÓN ĂN</span>
+             
             </button>
             
             <div className="search-bar">

@@ -32,7 +32,6 @@ public class HoaDonController {
     @GetMapping("/don-hang/{donHangId}")
     public ResponseEntity<?> getByDonHangId(@PathVariable Long donHangId) {
         try {
-            // AppConfig đã kiểm tra role, chỉ cần lấy hóa đơn
             HoaDon hoaDon = hoaDonService.getByDonHangIdWithEmailCheck(
                     donHangId, "admin@system.com", true
             );
@@ -103,6 +102,30 @@ public class HoaDonController {
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
                     "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Hoàn tiền cho đơn hàng đã thanh toán nhưng bị hủy
+     */
+    @PutMapping("/hoan-tien/{donHangId}")
+    public ResponseEntity<?> hoanTien(@PathVariable Long donHangId) {
+        try {
+            hoaDonService.hoanTien(donHangId);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Hoàn tiền thành công. Trạng thái hóa đơn đã chuyển sang DA_HOAN_TRA."
+            ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                    "success", false,
+                    "message", "Có lỗi xảy ra khi hoàn tiền: " + e.getMessage()
             ));
         }
     }

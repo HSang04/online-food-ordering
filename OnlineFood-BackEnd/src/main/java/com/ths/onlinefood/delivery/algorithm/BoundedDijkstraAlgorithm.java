@@ -47,10 +47,10 @@ public class BoundedDijkstraAlgorithm {
                       Set<Integer> sources,
                       int recursionLevel,
                       double boundary) {
-        if (recursionLevel < 0)
-            throw new IllegalArgumentException("Recursion level must be >= 0");
-        if (boundary < 0)
-            throw new IllegalArgumentException("Boundary must be >= 0");
+        if (recursionLevel <= 0)
+            throw new IllegalArgumentException("y/c level de quy > 0");
+        if (boundary <= 0)
+            throw new IllegalArgumentException("y/c bound > 0");
 
         EdgeExplorer explorer = graph.createEdgeExplorer();
         Map<Integer, Double> dist = new HashMap<>();

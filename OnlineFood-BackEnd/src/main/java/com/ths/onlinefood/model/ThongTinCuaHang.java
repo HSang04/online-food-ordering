@@ -45,11 +45,11 @@ public class ThongTinCuaHang {
     private LocalTime gioDongCua;
     
     @Column(name = "ngay_tao")
-    @JsonIgnore  // Ẩn khỏi JSON response
+    @JsonIgnore 
     private LocalDateTime ngayTao;
     
     @Column(name = "ngay_cap_nhat")
-    @JsonIgnore  // Ẩn khỏi JSON response
+    @JsonIgnore  
     private LocalDateTime ngayCapNhat;
     
      @Column(name = "vi_do")
@@ -58,7 +58,7 @@ public class ThongTinCuaHang {
     @Column(name = "kinh_do")
     private Double kinhDo;
     
-    // Timezone cho Việt Nam (GMT+7)
+ 
     private static final ZoneId VIETNAM_TIMEZONE = ZoneId.of("Asia/Ho_Chi_Minh");
     
     @PrePersist
@@ -72,18 +72,13 @@ public class ThongTinCuaHang {
         ngayCapNhat = LocalDateTime.now();
     }
     
-    /**
-     * Lấy thời gian hiện tại theo timezone Việt Nam
-     */
+   
     @JsonIgnore
     private LocalTime getCurrentTimeInVietnam() {
         return ZonedDateTime.now(VIETNAM_TIMEZONE).toLocalTime();
     }
     
-    /**
-     * Kiểm tra cửa hàng có đang mở không (sử dụng timezone Việt Nam)
-     * QUAN TRỌNG: Method này sẽ được serialize thành JSON với key "open"
-     */
+   
     @JsonProperty("isOpen")  // Đảm bảo JSON key là "isOpen"
     public boolean isOpen() {
         if (gioMoCua == null || gioDongCua == null) {
@@ -93,34 +88,25 @@ public class ThongTinCuaHang {
         return !hienTai.isBefore(gioMoCua) && !hienTai.isAfter(gioDongCua);
     }
     
-    /**
-     * Alternative getter để đảm bảo JSON serialization
-     */
+  
     @JsonIgnore  // Tránh duplicate key trong JSON
     public boolean getIsOpen() {
         return isOpen();
     }
     
-    /**
-     * Lấy giờ mở cửa dạng HH:mm
-     */
+  
     @JsonIgnore
     public String getGioMoCuaFormatted() {
         return gioMoCua != null ? gioMoCua.toString().substring(0, 5) : "";
     }
     
-    /**
-     * Lấy giờ đóng cửa dạng HH:mm
-     */
+ 
     @JsonIgnore
     public String getGioDongCuaFormatted() {
         return gioDongCua != null ? gioDongCua.toString().substring(0, 5) : "";
     }
     
-    /**
-     * Lấy thông tin trạng thái cửa hàng
-     * Method này sẽ được serialize thành JSON với key "thongTin"
-     */
+ 
     @JsonProperty("thongTin")
     public String getTrangThaiInfo() {
         if (gioMoCua == null || gioDongCua == null) {
@@ -134,17 +120,13 @@ public class ThongTinCuaHang {
         }
     }
     
-    /**
-     * Lấy giờ mở cửa cho JSON response (format HH:mm)
-     */
+   
     @JsonProperty("gioMoCua")
     public String getGioMoCuaString() {
         return getGioMoCuaFormatted();
     }
     
-    /**
-     * Lấy giờ đóng cửa cho JSON response (format HH:mm)
-     */
+   
     @JsonProperty("gioDongCua") 
     public String getGioDongCuaString() {
         return getGioDongCuaFormatted();
