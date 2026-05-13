@@ -11,7 +11,7 @@ const TrangChu = () => {
   const heroSlides = [
     {
       title: "Hương vị tuyệt vời",
-      subtitle: "Khám phá thế giới ẩm thực đa dạng với hơn 1000+ món ăn ngon",
+      subtitle: "Khám phá thế giới ẩm thực đa dạng với hơn 100+ món ăn ngon",
       image: img1
     },
     {

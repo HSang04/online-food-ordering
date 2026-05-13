@@ -208,7 +208,7 @@ const GiaoHang = () => {
         ) : (
           <div className="giao-hang-orders-grid">
             {filteredOrders.map((order) => {
-              const diffMins = Math.floor((new Date() - new Date(order.ngayTao)) / 60000);
+              const diffMins = Math.floor((new Date() - new Date(order.ngayTao)) / 60000); // 30p = qua thoi gian
               const isUrgent = diffMins > 30;
 
               return (
@@ -217,7 +217,7 @@ const GiaoHang = () => {
                   className={`giao-hang-order-card ${isUrgent ? 'urgent' : ''}`}
                   onClick={() => handleViewDetails(order)}
                 >
-                  {isUrgent && <div className="giao-hang-urgent-badge">⚠️ Quá thời gian</div>}
+                  {isUrgent && <div className="giao-hang-urgent-badge"> Quá thời gian</div>}
 
                   <div className="giao-hang-order-header">
                     <div className="giao-hang-order-id">

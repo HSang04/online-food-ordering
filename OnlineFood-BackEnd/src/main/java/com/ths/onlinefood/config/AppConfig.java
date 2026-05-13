@@ -51,6 +51,12 @@ public class AppConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/danh-gia-mon-an/**").authenticated()
 
                 .requestMatchers(HttpMethod.GET, "/api/hinh-anh-mon-an/**").permitAll()
+                    
+                .requestMatchers(
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**"
+                ).permitAll()
 
                 .requestMatchers("/api/nguoi-dung/**")
                     .hasAnyAuthority("ADMIN", "QUANLY")
