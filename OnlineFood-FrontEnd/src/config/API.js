@@ -1,7 +1,7 @@
 import axios from "axios";
 import cookie from "react-cookies";
 
-export const BASE_URL = "http://localhost:8080";
+export const BASE_URL = process.env.REACT_APP_API_URL ;
 
 export const endpoints = {
   LOGIN: `${BASE_URL}/auth/login`,
