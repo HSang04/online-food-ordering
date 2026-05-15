@@ -13,10 +13,14 @@ export const authAxios = () => {
     baseURL: BASE_URL,
     headers: {
       Authorization: `Bearer ${cookie.load("token")}`,
+      'ngrok-skip-browser-warning': 'true'  
     },
   });
 };
 
 export default axios.create({
   baseURL: BASE_URL,
+  headers: {
+    'ngrok-skip-browser-warning': 'true'  
+  }
 });
