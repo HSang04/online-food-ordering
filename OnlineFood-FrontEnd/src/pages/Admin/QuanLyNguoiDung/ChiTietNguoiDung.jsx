@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from "../../../services/axiosInstance";
 import './ChiTietNguoiDung.css';
+import API from '../../../config/API'
 
 const ChiTietNguoiDung = () => {
   const { id } = useParams();
@@ -193,9 +194,9 @@ const ChiTietNguoiDung = () => {
       if (mode === 'create') {
         console.log('Creating user with data:', formData);
         
-        await axios.post('http://localhost:8080/auth/signup-by-admin', formData, {
-          headers: { Authorization: `Bearer ${jwt}` }
-        });
+      await API.post('/auth/signup-by-admin', formData, {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
         
         navigate('/quan-ly-nguoi-dung', { 
           state: { message: 'Tạo người dùng thành công' } 

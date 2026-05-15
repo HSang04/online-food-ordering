@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import './DangKy.css';
+import API, { endpoints } from '../../../config/API';
 
 const DangKy = () => {
   const [formData, setFormData] = useState({
@@ -59,7 +59,7 @@ const DangKy = () => {
   }
 
   try {
-    await axios.post('http://localhost:8080/auth/signup', formData);
+    await API.post(endpoints.SIGNUP, formData);
     alert('Đăng ký thành công! Hãy đăng nhập.');
     navigate('/login');
   } catch (error) {

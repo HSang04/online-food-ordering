@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import './DangNhap.css';
+import API, { endpoints } from '../../../config/API';
 
 
 const DangNhap = () => {
@@ -34,7 +34,7 @@ const DangNhap = () => {
       }
 
       try {
-        const response = await axios.post('http://localhost:8080/auth/login', formData);
+        const response = await API.post(endpoints.LOGIN, formData);
         if (response.data.jwt) {
           localStorage.setItem('jwt', response.data.jwt);
           localStorage.setItem('idNguoiDung', response.data.id);
