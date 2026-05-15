@@ -95,7 +95,10 @@ public class AppConfig {
     private CorsConfigurationSource corsConfigurationSource() {
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
-            config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+            config.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000",
+            "https://online-food-ordering-delta.vercel.app"  
+        ));
             config.setAllowedMethods(Collections.singletonList("*"));
             config.setAllowCredentials(true);
             config.setAllowedHeaders(Collections.singletonList("*"));
