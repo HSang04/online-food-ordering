@@ -157,6 +157,7 @@ public class AppConfig {
                 "GET",
                 "POST",
                 "PUT",
+                "PATCH",
                 "DELETE",
                 "OPTIONS"
             ));

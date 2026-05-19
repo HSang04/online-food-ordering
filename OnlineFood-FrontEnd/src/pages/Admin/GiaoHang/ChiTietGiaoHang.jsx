@@ -512,7 +512,7 @@ const ChiTietGiaoHang = () => {
           disabled={loadingComplete}
           className="ctgh-btn-complete"
         >
-          {loadingComplete ? '⏳ Đang xử lý...' : '✅ Hoàn thành giao hàng'}
+          {loadingComplete ? ' Đang xử lý...' : ' Hoàn thành giao hàng'}
         </button>
       </div>
 

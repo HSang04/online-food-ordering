@@ -32,7 +32,8 @@ public class VNPayService {
     private final String vnp_TmnCode = "R4IU0VVI";
     private final String vnp_HashSecret = "4XUBIGX3UZB90NX1XBOOZBCG7ZM4ZHJE";
     private final String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    private final String vnp_ReturnUrl = "http://localhost:3000/vnpay-result"; // URL return sau thanh toán
+    //private final String vnp_ReturnUrl = "http://localhost:3000/vnpay-result"; 
+    private final String vnp_ReturnUrl = "http://online-food-ordering-delta.vercel.app/vnpay-result"; // URL return sau thanh toán
 
    
     public String createPayment(String bookingID, long amount, String bankCode, HttpServletRequest request)
