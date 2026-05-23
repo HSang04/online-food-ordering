@@ -29,8 +29,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class VNPayService {
 
-    private final String vnp_TmnCode = "R4IU0VVI";
-    private final String vnp_HashSecret = "4XUBIGX3UZB90NX1XBOOZBCG7ZM4ZHJE";
+    private final String vnp_TmnCode = "9RG7DRSV";
+    private final String vnp_HashSecret = "6MRZDBXJ4X4MYL49Z3ZD5AABQ7D177S6";
     private final String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     //private final String vnp_ReturnUrl = "http://localhost:3000/vnpay-result"; 
     private final String vnp_ReturnUrl = "http://online-food-ordering-delta.vercel.app/vnpay-result"; // URL return sau thanh toán

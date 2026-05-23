@@ -197,7 +197,6 @@ const ChiTietGiaoHang = () => {
         };
         setCurrentLocation(loc);
         setLoadingLocation(false);
-        // Tự tính đường GPS->điểm giao ngay khi lấy được vị trí
         if (donHang) calculateRouteFromGps(coords.latitude, coords.longitude, donHang);
       },
       (err) => {
@@ -208,28 +207,14 @@ const ChiTietGiaoHang = () => {
         };
         setLocationError(msgs[err.code] || 'Không thể lấy vị trí hiện tại');
         setLoadingLocation(false);
-        // Nếu không lấy được GPS -> tự chuyển sang route từ cửa hàng
         setRouteMode('store');
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   }, [donHang, calculateRouteFromGps]);
 
-  // ── Complete delivery ──
+  // ── Complete delivery (bỏ confirm, gọi API thẳng) ──
   const handleCompleteDelivery = async () => {
-    const isCOD = donHang.hoaDon?.phuongThuc !== 'VNPAY';
-    const phiShip = (donHang.tongTien || 0) >= MIEN_PHI_TU ? 0 : PHI_SHIP;
-    const tongThuTien = isCOD ? (donHang.tongTien || 0) + phiShip : 0;
-
-    if (!window.confirm(
-      `Xác nhận hoàn thành giao hàng cho đơn #${donHang.id}?\n\n` +
-      `Khách hàng: ${donHang.nguoiDung?.hoTen || donHang.nguoiDung?.tenNguoiDung}\n` +
-      (isCOD
-        ? `💰 Cần thu: ${tongThuTien.toLocaleString()}₫ (tiền mặt)\n`
-        : `✅ Đã thanh toán VNPay — không thu tiền\n`) +
-      `\nSau khi xác nhận, đơn hàng sẽ chuyển sang trạng thái "Hoàn thành".`
-    )) return;
-
     setLoadingComplete(true);
     try {
       await axios.patch(`/don-hang/${donHang.id}/hoan-thanh`, {}, { params: { shipperId }, headers: authHeader });
@@ -258,7 +243,6 @@ const ChiTietGiaoHang = () => {
     }
   }, [id]); // eslint-disable-line
 
-  // Khi có donHang: lấy GPS (tự tính route GPS) + tính route từ store
   useEffect(() => {
     if (donHang) {
       getCurrentLocation();
@@ -308,10 +292,9 @@ const ChiTietGiaoHang = () => {
         <h1 className="ctgh-header-title">🚚 Đơn #{donHang.id}</h1>
       </header>
 
-      {/* ── BẢN ĐỒ (đặt lên đầu trên mobile) ── */}
+      {/* ── BẢN ĐỒ ── */}
       <div className="ctgh-map-section">
 
-        {/* Toggle chế độ đường đi */}
         <div className="ctgh-route-toggle">
           <button
             className={`ctgh-toggle-btn ${routeMode === 'gps' ? 'active' : ''}`}
@@ -327,7 +310,6 @@ const ChiTietGiaoHang = () => {
           </button>
         </div>
 
-        {/* Route info badge */}
         {routeInfo && (
           <div className="ctgh-route-badge">
             <span>📏 {routeInfo.distance?.toFixed(1)} km</span>
@@ -351,7 +333,6 @@ const ChiTietGiaoHang = () => {
           </div>
         )}
 
-        {/* GPS không có -> cảnh báo khi ở chế độ GPS */}
         {routeMode === 'gps' && !currentLocation && !loadingLocation && (
           <div className="ctgh-gps-warning">
             ⚠️ Chưa lấy được vị trí GPS.
@@ -359,7 +340,6 @@ const ChiTietGiaoHang = () => {
           </div>
         )}
 
-        {/* Bản đồ */}
         <div className="ctgh-map-wrap">
           <MapContainer center={mapCenter} zoom={14} style={{ width: '100%', height: '100%' }}>
             <TileLayer
@@ -368,14 +348,12 @@ const ChiTietGiaoHang = () => {
             />
             {allPositions.length > 0 && <AutoFitBounds positions={allPositions} />}
 
-            {/* Marker cửa hàng */}
             {storeInfo?.viDo && storeInfo?.kinhDo && (
               <Marker position={[storeInfo.viDo, storeInfo.kinhDo]} icon={storeIcon}>
                 <Popup><strong>🏪 {storeInfo.ten}</strong><div>{storeInfo.diaChi}</div></Popup>
               </Marker>
             )}
 
-            {/* Marker điểm giao */}
             {donHang.latGiaoHang && donHang.lonGiaoHang && (
               <Marker position={[donHang.latGiaoHang, donHang.lonGiaoHang]} icon={deliveryIcon}>
                 <Popup>
@@ -386,7 +364,6 @@ const ChiTietGiaoHang = () => {
               </Marker>
             )}
 
-            {/* Marker vị trí GPS */}
             {currentLocation && (
               <Marker position={[currentLocation.lat, currentLocation.lon]} icon={currentLocationIcon}>
                 <Popup>
@@ -396,7 +373,6 @@ const ChiTietGiaoHang = () => {
               </Marker>
             )}
 
-            {/* Đường đi */}
             {routePath.length > 0 && (
               <Polyline
                 positions={routePath}
@@ -407,7 +383,6 @@ const ChiTietGiaoHang = () => {
           </MapContainer>
         </div>
 
-        {/* Legend */}
         <div className="ctgh-legend">
           {routeMode === 'store' && <span><span className="ctgh-dot green"/>Cửa hàng</span>}
           {routeMode === 'gps'   && <span><span className="ctgh-dot blue"/>Vị trí bạn</span>}
@@ -512,7 +487,7 @@ const ChiTietGiaoHang = () => {
           disabled={loadingComplete}
           className="ctgh-btn-complete"
         >
-          {loadingComplete ? ' Đang xử lý...' : ' Hoàn thành giao hàng'}
+          {loadingComplete ? '⏳ Đang xử lý...' : '✅ Hoàn thành giao hàng'}
         </button>
       </div>
 

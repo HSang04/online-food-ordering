@@ -2,7 +2,7 @@
 .ctgh-container {
   max-width: 640px;
   margin: 0 auto;
-  padding: 0 0 100px;
+  padding: 0 0 160px; /* tăng từ 100px → 160px để nội dung không bị nút che */
   font-family: 'Segoe UI', system-ui, sans-serif;
   background: #f4f6fb;
   min-height: 100vh;
@@ -319,15 +319,20 @@
 }
 .ctgh-btn-refresh-gps:hover { background: #bee3f8; }
 
-/* ── Complete section (sticky bottom) ───────────────────── */
+/* ── Complete section (fixed bottom, tránh bottom nav) ───── */
 .ctgh-complete-section {
   position: fixed;
-  bottom: 0; left: 0; right: 0;
-  padding: 12px 16px;
+  bottom: 60px; /* ← đẩy lên 60px để tránh bottom navigation bar */
+  left: 0;
+  right: 0;
+  padding: 10px 16px;
   background: white;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
   z-index: 99;
+  max-width: 640px;
+  margin: 0 auto;
 }
+
 .ctgh-btn-complete {
   width: 100%;
   padding: 16px;
@@ -383,9 +388,11 @@
 
   .ctgh-complete-section {
     position: static;
+    bottom: auto;
     padding: 0;
     box-shadow: none;
     margin: 12px 12px 24px;
+    max-width: none;
   }
   .ctgh-btn-complete {
     border-radius: 12px;
