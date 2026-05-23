@@ -3,6 +3,8 @@ import axios from "../../../services/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import "./GioHang.css";
 
+const MAX_QUANTITY = 20;
+
 const GioHang = () => {
   const navigate = useNavigate();
 
@@ -15,12 +17,12 @@ const GioHang = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [updatingItems, setUpdatingItems] = useState(new Set()); 
+  const [updatingItems, setUpdatingItems] = useState(new Set());
   const [cuaHangStatus, setCuaHangStatus] = useState(null);
-  const [cuaHangInfo, setCuaHangInfo] = useState(null); 
+  const [cuaHangInfo, setCuaHangInfo] = useState(null);
 
   const nguoiDungId = localStorage.getItem("idNguoiDung");
-  const debounceTimers = useRef({}); 
+  const debounceTimers = useRef({});
 
   const getAuthToken = () => {
     return localStorage.getItem('jwt') || sessionStorage.getItem('jwt');
@@ -61,7 +63,6 @@ const GioHang = () => {
     }
   }, []);
 
-  
   const checkCuaHangStatus = useCallback(async () => {
     try {
       const jwt = getAuthToken();
@@ -73,32 +74,30 @@ const GioHang = () => {
       setCuaHangStatus(response.data);
     } catch (err) {
       console.error("Lỗi khi kiểm tra trạng thái cửa hàng:", err);
-      
-   
+
       if (cuaHangInfo?.gioMoCua && cuaHangInfo?.gioDongCua) {
         const currentTime = new Date();
         const currentHour = currentTime.getHours();
         const currentMinute = currentTime.getMinutes();
         const currentTimeMinutes = currentHour * 60 + currentMinute;
-        
+
         const [openHour, openMinute] = cuaHangInfo.gioMoCua.split(':').map(Number);
         const [closeHour, closeMinute] = cuaHangInfo.gioDongCua.split(':').map(Number);
         const openTimeMinutes = openHour * 60 + openMinute;
         const closeTimeMinutes = closeHour * 60 + closeMinute;
-        
+
         const isOpen = currentTimeMinutes >= openTimeMinutes && currentTimeMinutes < closeTimeMinutes;
 
         setCuaHangStatus({
           isOpen: isOpen,
           isMo: isOpen,
-          thongTin: isOpen ? 
-            `Đang mở cửa - Đóng cửa lúc ${cuaHangInfo.gioDongCua.substring(0, 5)}` : 
+          thongTin: isOpen ?
+            `Đang mở cửa - Đóng cửa lúc ${cuaHangInfo.gioDongCua.substring(0, 5)}` :
             `Đã đóng cửa - Mở cửa từ ${cuaHangInfo.gioMoCua.substring(0, 5)} đến ${cuaHangInfo.gioDongCua.substring(0, 5)}`,
           gioMoCua: cuaHangInfo.gioMoCua,
           gioDongCua: cuaHangInfo.gioDongCua
         });
       } else {
-     
         setCuaHangStatus({
           isOpen: false,
           isMo: false,
@@ -113,25 +112,25 @@ const GioHang = () => {
   const fetchGioHang = useCallback(async (silent = false) => {
     try {
       if (!silent) setLoading(true);
-      
+
       const gioHangRes = await axios.get(`/gio-hang/${nguoiDungId}`);
       const gioHangData = Array.isArray(gioHangRes.data) ? gioHangRes.data : [];
-      
+
       const processedData = gioHangData.map(item => ({
         ...item,
-        id: item.id || `${item.monAnId}-${Date.now()}`, 
+        id: item.id || `${item.monAnId}-${Date.now()}`,
         monAnId: item.monAnId || item.monAn?.id,
         monAn: {
           ...item.monAn,
           id: item.monAn?.id || item.monAnId,
           tenMonAn: item.monAn?.tenMonAn || "Món ăn",
           gia: item.monAn?.gia || item.monAn?.giaHienThi || 0,
-          hinhAnhMonAns: item.monAn?.hinhAnhMonAns || 
+          hinhAnhMonAns: item.monAn?.hinhAnhMonAns ||
             (item.monAn?.hinhAnhUrl ? [{ duongDan: item.monAn.hinhAnhUrl }] : []),
           khuyenMai: item.monAn?.khuyenMai || null
         }
       }));
-      
+
       setGioHang(processedData);
       setThongKe(calculateThongKe(processedData));
 
@@ -148,8 +147,8 @@ const GioHang = () => {
       const newGioHang = prevGioHang.map(item => {
         if (item.id === itemId) {
           const gia = tinhGiaThucTe(item.monAn);
-          const updatedItem = { 
-            ...item, 
+          const updatedItem = {
+            ...item,
             soLuong: newQuantity,
             thanhTien: gia * newQuantity,
             tietKiem: (item.monAn?.soTienGiam || 0) * newQuantity
@@ -158,7 +157,7 @@ const GioHang = () => {
         }
         return item;
       });
-      
+
       setThongKe(calculateThongKe(newGioHang));
       return newGioHang;
     });
@@ -168,7 +167,7 @@ const GioHang = () => {
     if (debounceTimers.current[itemId]) {
       clearTimeout(debounceTimers.current[itemId]);
     }
-    
+
     debounceTimers.current[itemId] = setTimeout(async () => {
       setUpdatingItems(prev => new Set([...prev, itemId]));
       try {
@@ -193,25 +192,24 @@ const GioHang = () => {
       setLoading(false);
       return;
     }
-    
+
     const initData = async () => {
       const cuaHangData = await fetchCuaHangInfo();
       setCuaHangInfo(cuaHangData);
       await fetchGioHang();
     };
-    
+
     initData();
   }, [nguoiDungId, fetchCuaHangInfo, fetchGioHang]);
 
   useEffect(() => {
     if (cuaHangInfo) {
       checkCuaHangStatus();
-      
-      // Kiểm tra trạng thái cửa hàng mỗi 1 phút
+
       const statusInterval = setInterval(() => {
         checkCuaHangStatus();
-      }, 60000); // 1 phút = 60000ms
-      
+      }, 60000);
+
       return () => clearInterval(statusInterval);
     }
   }, [cuaHangInfo, checkCuaHangStatus]);
@@ -252,6 +250,11 @@ const GioHang = () => {
     const currentItem = gioHang.find(item => item.id === id);
     if (!currentItem) return;
 
+    if (currentItem.soLuong >= MAX_QUANTITY) {
+      alert(`Số lượng tối đa cho mỗi món là ${MAX_QUANTITY}`);
+      return;
+    }
+
     const newQuantity = currentItem.soLuong + 1;
     updateQuantityOptimistic(id, newQuantity);
     debouncedApiCall(id, () => axios.put(`/gio-hang/${nguoiDungId}/increase/${id}`));
@@ -268,12 +271,17 @@ const GioHang = () => {
 
   const handleQuantityChange = (id, newQuantity) => {
     if (newQuantity < 1) return;
-    
+
+    if (newQuantity > MAX_QUANTITY) {
+      newQuantity = MAX_QUANTITY;
+      alert(`Số lượng tối đa cho mỗi món là ${MAX_QUANTITY}`);
+    }
+
     const currentItem = gioHang.find(item => item.id === id);
     if (!currentItem || currentItem.soLuong === newQuantity) return;
 
     updateQuantityOptimistic(id, newQuantity);
-    debouncedApiCall(id, () => 
+    debouncedApiCall(id, () =>
       axios.put(`/gio-hang/${nguoiDungId}/update-quantity/${id}`, {
         soLuong: newQuantity,
       }), 500
@@ -281,24 +289,21 @@ const GioHang = () => {
   };
 
   const handleDatHang = () => {
-    // Kiểm tra trạng thái cửa hàng trước (sử dụng cả isOpen và isMo để tương thích)
     const isStoreOpen = cuaHangStatus?.isOpen || cuaHangStatus?.isMo;
     if (cuaHangStatus && !isStoreOpen) {
       alert(`Không thể đặt hàng!\n${cuaHangStatus.thongTin}`);
       return;
     }
 
-    // Validate dữ liệu trước khi chuyển trang
     if (!gioHang || gioHang.length === 0) {
       alert("Giỏ hàng trống, không thể đặt hàng");
       return;
     }
 
-    // Đảm bảo mọi món đều có đầy đủ thông tin cần thiết
-    const isValidData = gioHang.every(item => 
-      item.monAnId && 
-      item.monAn && 
-      item.monAn.tenMonAn && 
+    const isValidData = gioHang.every(item =>
+      item.monAnId &&
+      item.monAn &&
+      item.monAn.tenMonAn &&
       item.soLuong > 0 &&
       (item.monAn.gia > 0 || (item.monAn.khuyenMai && item.monAn.khuyenMai.giaGiam > 0))
     );
@@ -308,7 +313,6 @@ const GioHang = () => {
       return;
     }
 
-    // Chuẩn bị dữ liệu gửi đến trang thanh toán
     const dataToSend = {
       gioHang: gioHang.map(item => ({
         id: item.id,
@@ -331,7 +335,6 @@ const GioHang = () => {
         soLuongMonAn: thongKe.soLuongMonAn,
         tongSoLuong: thongKe.tongSoLuong
       },
-      // Backward compatibility - keep old structure
       tongTien: thongKe.tongTien,
       tongTietKiem: thongKe.tongTietKiem,
       soLuongMonAn: thongKe.soLuongMonAn,
@@ -358,14 +361,12 @@ const GioHang = () => {
     );
   }
 
-  // Kiểm tra trạng thái cửa hàng (tương thích với cả isOpen và isMo)
   const isStoreOpen = cuaHangStatus?.isOpen || cuaHangStatus?.isMo;
 
   return (
     <div className="gio-hang-container">
       <h2>🛒 Giỏ hàng của bạn</h2>
 
-    
       {cuaHangStatus && (
         <div className={`store-status ${isStoreOpen ? 'open' : 'closed'}`}>
           <div className="status-indicator">
@@ -386,8 +387,8 @@ const GioHang = () => {
       {gioHang.length === 0 ? (
         <div className="gio-hang-empty">
           <p>Không có món nào trong giỏ hàng.</p>
-          <button 
-            className="btn-primary" 
+          <button
+            className="btn-primary"
             onClick={() => navigate("/menu")}
           >
             Đi đặt món ngay
@@ -436,7 +437,7 @@ const GioHang = () => {
                         className="gio-hang-img"
                       />
                     </td>
-                    
+
                     <td>
                       <div className="mon-an-info">
                         <span className="ten-mon">{item.monAn?.tenMonAn || "N/A"}</span>
@@ -447,7 +448,7 @@ const GioHang = () => {
                         )}
                       </div>
                     </td>
-                    
+
                     <td>
                       <div className="gia-info">
                         <span className="gia-hien-tai">
@@ -460,7 +461,7 @@ const GioHang = () => {
                         )}
                       </div>
                     </td>
-                    
+
                     <td>
                       <div className="quantity-controls">
                         <button
@@ -478,12 +479,14 @@ const GioHang = () => {
                           }
                           className={`quantity-input ${updatingItems.has(item.id) ? 'updating' : ''}`}
                           min="1"
+                          max={MAX_QUANTITY}
                           disabled={updatingItems.has(item.id)}
                         />
                         <button
                           className="btn-quantity"
                           onClick={() => handleIncrease(item.id)}
-                          disabled={updatingItems.has(item.id)}
+                          disabled={item.soLuong >= MAX_QUANTITY || updatingItems.has(item.id)}
+                          title={item.soLuong >= MAX_QUANTITY ? `Tối đa ${MAX_QUANTITY} món` : ''}
                         >
                           +
                         </button>
@@ -494,13 +497,13 @@ const GioHang = () => {
                         )}
                       </div>
                     </td>
-                    
+
                     <td>
                       <span className="thanh-tien">
                         {(giaThucTe * item.soLuong).toLocaleString()}₫
                       </span>
                     </td>
-                    
+
                     <td>
                       {item.tietKiem > 0 ? (
                         <span className="tiet-kiem">
@@ -510,14 +513,13 @@ const GioHang = () => {
                         <span className="no-saving">-</span>
                       )}
                     </td>
-                    
+
                     <td>
                       <button
                         className="btn-xoa"
                         onClick={() => handleRemove(item.id)}
                         title="Xóa khỏi giỏ hàng"
                       >
-                        🗑️
                       </button>
                     </td>
                   </tr>
@@ -537,31 +539,31 @@ const GioHang = () => {
                     </span>
                   </div>
                 )}
-                
+
                 <div className="tong-thanh-toan">
                   <span>Tổng thanh toán: </span>
                   <span className="so-tien-tong">
                     {thongKe.tongTien.toLocaleString()}₫
                   </span>
-                  </div>
+                </div>
               </div>
-              
+
               <div className="action-buttons">
-                <button 
-                  className="btn-xoa-all" 
+                <button
+                  className="btn-xoa-all"
                   onClick={handleClear}
                   title="Xóa tất cả món trong giỏ hàng"
                 >
                   Xóa tất cả
                 </button>
-                <button 
+                <button
                   className={`btn-dat-hang ${!isStoreOpen ? 'disabled' : ''}`}
                   onClick={handleDatHang}
                   disabled={gioHang.length === 0 || !isStoreOpen}
                   title={!isStoreOpen ? 'Cửa hàng đã đóng, không thể đặt hàng' : ''}
                 >
-                  {!isStoreOpen ? 
-                    `🔒 Cửa hàng đã đóng` : 
+                  {!isStoreOpen ?
+                    `🔒 Cửa hàng đã đóng` :
                     `Đặt hàng (${thongKe.soLuongMonAn} món)`
                   }
                 </button>
