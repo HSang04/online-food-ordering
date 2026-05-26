@@ -219,7 +219,6 @@ const ChiTietGiaoHang = () => {
     try {
       await axios.patch(`/don-hang/${donHang.id}/hoan-thanh`, {}, { params: { shipperId }, headers: authHeader });
       try { await axios.put(`/hoa-don/cap-nhat-hoan-thanh/${donHang.id}`, {}, { headers: authHeader }); } catch {}
-      alert('✅ Đơn hàng đã được hoàn thành!');
       navigate('/quan-ly/giao-hang');
     } catch (err) {
       if (err.response?.status === 403) alert('⚠️ Bạn không phải shipper của đơn hàng này!');
