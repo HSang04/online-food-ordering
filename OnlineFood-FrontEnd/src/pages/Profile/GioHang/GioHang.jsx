@@ -515,11 +515,12 @@ const GioHang = () => {
                     </td>
 
                     <td>
-                      <button
+                     <button
                         className="btn-xoa"
                         onClick={() => handleRemove(item.id)}
                         title="Xóa khỏi giỏ hàng"
                       >
+                        Xóa
                       </button>
                     </td>
                   </tr>
