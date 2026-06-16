@@ -1,4 +1,4 @@
-# OnlineFood - Website Đặt Món Ăn Trực Tuyến - Kien Ly 
+# OnlineFood - Website Đặt Món Ăn Trực Tuyến 
 
 ## 📖 Giới thiệu
 
